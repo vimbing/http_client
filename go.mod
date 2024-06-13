@@ -1,4 +1,4 @@
-module github.com/vimbing/http
+module github.com/vimbing/httpv2
 
 go 1.22.1
 
