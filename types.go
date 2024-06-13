@@ -8,6 +8,13 @@ import (
 	tls "github.com/vimbing/vutls"
 )
 
+type OptionStringJa string
+type OptionTimeout time.Duration
+type OptionProxy string
+type OptionDisallowRedirect bool
+type OptionUtlsJa3HelloId tls.ClientHelloID
+type OptionUtlsJa3HelloSpec tls.ClientHelloSpec
+
 type Client struct {
 	fhttpClient *fhttp.Client
 	cfg         *Config
