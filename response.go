@@ -1,6 +1,7 @@
 package httpv3
 
 import (
+	"encoding/json"
 	"fmt"
 )
 
@@ -10,6 +11,10 @@ func (r *Response) StatusCode() int {
 
 func (r *Response) Status() string {
 	return r.fhttpResponse.Status
+}
+
+func (r *Response) BodyDecode(out any) error {
+	return json.Unmarshal(r.body, out)
 }
 
 func (r *Response) BodyString() string {
