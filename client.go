@@ -40,7 +40,7 @@ func (c *Client) Do(req *Request) (*Response, error) {
 	}
 
 	res := &Response{
-		body:          decodedBody,
+		Body:          decodedBody,
 		fhttpResponse: fhttpRes,
 	}
 

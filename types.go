@@ -44,6 +44,6 @@ type Request struct {
 }
 
 type Response struct {
-	body          []byte
+	Body          []byte
 	fhttpResponse *fhttp.Response
 }

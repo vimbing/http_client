@@ -14,11 +14,11 @@ func (r *Response) Status() string {
 }
 
 func (r *Response) BodyDecode(out any) error {
-	return json.Unmarshal(r.body, out)
+	return json.Unmarshal(r.Body, out)
 }
 
 func (r *Response) BodyString() string {
-	return string(r.body)
+	return string(r.Body)
 }
 
 func (r *Response) BodyStringJsonIndented(out any) string {
@@ -38,7 +38,7 @@ func (r *Response) BodyStringJsonIndented(out any) string {
 }
 
 func (r *Response) BodyBytes() []byte {
-	return r.body
+	return r.Body
 }
 
 // just for logging purposes
