@@ -21,6 +21,22 @@ func (r *Response) BodyString() string {
 	return string(r.body)
 }
 
+func (r *Response) BodyStringJsonIndented(out any) string {
+	err := r.BodyDecode(out)
+
+	if err != nil {
+		return ""
+	}
+
+	indented, err := json.MarshalIndent(out, "", "	")
+
+	if err != nil {
+		return ""
+	}
+
+	return string(indented)
+}
+
 func (r *Response) BodyBytes() []byte {
 	return r.body
 }

@@ -4,22 +4,24 @@ import (
 	"time"
 
 	"github.com/repeale/fp-go"
+	lo "github.com/samber/lo"
 	tls "github.com/vimbing/vutls"
 )
 
-func WithProxyListUnformatted(proxy string) []OptionProxy {
-	return []OptionProxy{OptionProxy(proxy)}
+func WithProxyList(proxyList []string) []OptionProxy {
+	return append([]OptionProxy{}, parseList(proxyList)...)
 }
 
-func WithProxyList(proxy string) []OptionProxy {
-	return []OptionProxy{OptionProxy(proxy)}
-}
-
-func WithProxyUnformatted(proxy string) OptionProxy {
-	return OptionProxy(proxy)
+func WithProxyListParsed(proxyList []string) []OptionProxy {
+	return append([]OptionProxy{}, lo.Map(proxyList, func(p string, i int) OptionProxy { return OptionProxy(p) })...)
 }
 
 func WithProxy(proxy string) OptionProxy {
+	parsed, _ := parseSingleProxy(proxy)
+	return OptionProxy(parsed)
+}
+
+func WithProxyParsed(proxy string) OptionProxy {
 	return OptionProxy(proxy)
 }
 
