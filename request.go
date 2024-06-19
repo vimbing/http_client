@@ -1,16 +1,26 @@
 package httpv3
 
-import fhttp "github.com/vimbing/fhttp"
+import (
+	"context"
+	"time"
 
-func (r *Request) Build() error {
-	req, err := fhttp.NewRequest(r.Method, r.Url, r.Body)
+	fhttp "github.com/vimbing/fhttp"
+)
+
+func (r *Request) Build(timeout time.Duration) (context.CancelFunc, error) {
+	ctx, cancel := context.WithTimeout(
+		context.Background(),
+		timeout,
+	)
+
+	req, err := fhttp.NewRequestWithContext(ctx, r.Method, r.Url, r.Body)
 
 	if err != nil {
-		return err
+		return cancel, err
 	}
 
 	req.Header = r.Header
 	r.fhttpRequest = req
 
-	return nil
+	return cancel, nil
 }

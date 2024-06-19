@@ -1,28 +1,8 @@
 package httpv3
 
 import (
-	"context"
 	"io"
-
-	fhttp "github.com/vimbing/fhttp"
 )
-
-type requestExecuteResult struct {
-	response *fhttp.Response
-	err      error
-}
-
-func (c *Client) executeRequest(req *Request, resultChan chan *requestExecuteResult) {
-	defer close(resultChan)
-
-	if err := req.Build(); err != nil {
-		resultChan <- &requestExecuteResult{err: err}
-		return
-	}
-
-	fhttpRes, err := c.fhttpClient.Do(req.fhttpRequest)
-	resultChan <- &requestExecuteResult{err: err, response: fhttpRes}
-}
 
 func (c *Client) Do(req *Request) (*Response, error) {
 	for _, m := range c.cfg.requestMiddleware {
@@ -31,29 +11,18 @@ func (c *Client) Do(req *Request) (*Response, error) {
 		}
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), c.cfg.timeout)
+	reqCtxCancel, err := req.Build(c.cfg.timeout)
 
-	defer cancel()
+	if err != nil {
+		return &Response{}, err
+	}
 
-	resultChan := make(chan *requestExecuteResult, 1)
+	defer reqCtxCancel()
 
-	go c.executeRequest(req, resultChan)
+	fhttpRes, err := c.fhttpClient.Do(req.fhttpRequest)
 
-	var fhttpRes *fhttp.Response
-
-	select {
-	case result := <-resultChan:
-		if result == nil {
-			return &Response{}, ErrResponseNil
-		}
-
-		if result.err != nil {
-			return &Response{}, result.err
-		}
-
-		fhttpRes = result.response
-	case <-ctx.Done():
-		return &Response{}, ErrRequestTimedOut
+	if err != nil {
+		return &Response{}, err
 	}
 
 	defer fhttpRes.Body.Close()
