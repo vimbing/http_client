@@ -2,7 +2,6 @@ package http
 
 import (
 	"context"
-	"strings"
 	"time"
 
 	fhttp "github.com/vimbing/fhttp"
@@ -13,18 +12,10 @@ func (r *Request) useTlsProfile() {
 		return
 	}
 
-	for k := range r.Header {
-		switch strings.ToLower(k) {
-		case "sec-ch-ua":
-			r.Header[k] = []string{r.tlsProfile.SecChUa}
-		case "sec-ch-ua-mobile":
-			r.Header[k] = []string{r.tlsProfile.SecChUaMobile}
-		case "sec-ch-ua-platform":
-			r.Header[k] = []string{r.tlsProfile.SecChaUaPlatform}
-		case "user-agent":
-			r.Header[k] = []string{r.tlsProfile.UserAgent}
-		}
-	}
+	r.Header.Set("sec-ch-ua", r.tlsProfile.SecChUa)
+	r.Header.Set("sec-ch-ua-mobile", r.tlsProfile.SecChUaMobile)
+	r.Header.Set("sec-ch-ua-platform", r.tlsProfile.SecChaUaPlatform)
+	r.Header.Set("user-agent", r.tlsProfile.UserAgent)
 }
 
 func (r *Request) Build(timeout time.Duration) (context.CancelFunc, error) {
