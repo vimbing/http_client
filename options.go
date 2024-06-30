@@ -37,6 +37,10 @@ func WithUtlsJa3Helloid(ja3HelloId tls.ClientHelloID) OptionUtlsJa3HelloId {
 	return OptionUtlsJa3HelloId(ja3HelloId)
 }
 
+func WithTlsProfile(tlsProfile TlsProfile) OptionTlsProfile {
+	return OptionTlsProfile(tlsProfile)
+}
+
 func parseOptions(options ...any) *Config {
 	defaultCfg := &Config{
 		proxies:       []string{},
@@ -57,6 +61,9 @@ func parseOptions(options ...any) *Config {
 			defaultCfg.timeout = time.Duration(v)
 		case OptionUtlsJa3HelloId:
 			defaultCfg.ja3 = tls.ClientHelloID(v)
+		case OptionTlsProfile:
+			profile := TlsProfile(v)
+			defaultCfg.tlsProfile = &profile
 		}
 	}
 

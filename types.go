@@ -14,6 +14,7 @@ type OptionProxy string
 type OptionDisallowRedirect bool
 type OptionUtlsJa3HelloId tls.ClientHelloID
 type OptionUtlsJa3HelloSpec tls.ClientHelloSpec
+type OptionTlsProfile TlsProfile
 
 type Client struct {
 	fhttpClient *fhttp.Client
@@ -30,6 +31,7 @@ type Config struct {
 	allowRedirect      bool
 	timeout            time.Duration
 	ja3                tls.ClientHelloID
+	tlsProfile         *TlsProfile
 }
 
 type RequestJsonBody any
@@ -40,10 +42,18 @@ type Request struct {
 	Header fhttp.Header
 	Url    string
 
+	tlsProfile   *TlsProfile
 	fhttpRequest *fhttp.Request
 }
 
 type Response struct {
 	Body          []byte
 	fhttpResponse *fhttp.Response
+}
+
+type TlsProfile struct {
+	SecChUa          string
+	SecChUaMobile    string
+	SecChaUaPlatform string
+	UserAgent        string
 }

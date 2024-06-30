@@ -11,7 +11,11 @@ func (c *Client) Do(req *Request) (*Response, error) {
 		}
 	}
 
-	reqCtxCancel, err := req.Build(c.cfg.timeout)
+	req.tlsProfile = c.cfg.tlsProfile
+
+	reqCtxCancel, err := req.Build(
+		c.cfg.timeout,
+	)
 
 	if err != nil {
 		return &Response{}, err
