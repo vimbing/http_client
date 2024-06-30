@@ -1,4 +1,4 @@
-package httpv3
+package http
 
 // Copyright 2018 Google Inc.
 //
