@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/andybalholm/brotli"
+	"github.com/klauspost/compress/zstd"
 	http "github.com/vimbing/fhttp"
 )
 
@@ -31,6 +32,8 @@ func decodeResponseBody(headers http.Header, body []byte) ([]byte, error) {
 		return gzipDecode(body)
 	case "deflate":
 		return deflateDecode(body)
+	case "zstd":
+		return zstdDecode(body)
 	default:
 		return body, nil
 	}
@@ -62,4 +65,16 @@ func gzipDecode(data []byte) ([]byte, error) {
 	defer gz.Close()
 
 	return io.ReadAll(gz)
+}
+
+func zstdDecode(data []byte) ([]byte, error) {
+	zs, err := zstd.NewReader(bytes.NewReader(data))
+
+	if err != nil {
+		return []byte{}, err
+	}
+
+	defer zs.Close()
+
+	return io.ReadAll(zs)
 }
