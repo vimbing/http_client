@@ -1,6 +1,8 @@
 package http
 
 import (
+	"io"
+
 	http "github.com/vimbing/fhttp"
 )
 
@@ -40,6 +42,8 @@ func (c *Client) newRequest(url string, options ...any) (*Request, error) {
 			req.Method = v
 		case http.Header:
 			req.Header = v
+		case io.Reader:
+			req.Body = v
 		case RequestJsonBody:
 			body, err := marshalAndEncodeBody(v)
 
