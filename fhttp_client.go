@@ -2,13 +2,15 @@ package http
 
 import (
 	http "github.com/vimbing/fhttp"
+	tls "github.com/vimbing/vutls"
 
 	"golang.org/x/net/proxy"
 )
 
 func newFhttpClient(cfg *Config) (*http.Client, error) {
 	client := &http.Client{
-		Timeout: cfg.timeout,
+		Timeout:   cfg.timeout,
+		Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}},
 	}
 
 	if !cfg.allowRedirect {

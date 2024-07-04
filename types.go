@@ -15,6 +15,7 @@ type OptionDisallowRedirect bool
 type OptionUtlsJa3HelloId tls.ClientHelloID
 type OptionUtlsJa3HelloSpec tls.ClientHelloSpec
 type OptionTlsProfile TlsProfile
+type OptionInsecureSkipVerify bool
 
 type Client struct {
 	fhttpClient *fhttp.Client
@@ -25,6 +26,7 @@ type RequestMiddlewareFunc func(*Request) error
 type ResponseMiddlewareFunc func(*Response) error
 
 type Config struct {
+	insecureSkipVerify bool
 	requestMiddleware  []RequestMiddlewareFunc
 	responseMiddleware []ResponseMiddlewareFunc
 	proxies            []string

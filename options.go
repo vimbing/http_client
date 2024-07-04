@@ -41,6 +41,10 @@ func WithTlsProfile(tlsProfile TlsProfile) OptionTlsProfile {
 	return OptionTlsProfile(tlsProfile)
 }
 
+func WithInsecureSkipVerify() OptionInsecureSkipVerify {
+	return OptionInsecureSkipVerify(true)
+}
+
 func parseOptions(options ...any) *Config {
 	defaultCfg := &Config{
 		proxies:       []string{},
@@ -64,6 +68,8 @@ func parseOptions(options ...any) *Config {
 		case OptionTlsProfile:
 			profile := TlsProfile(v)
 			defaultCfg.tlsProfile = &profile
+		case OptionInsecureSkipVerify:
+			defaultCfg.insecureSkipVerify = true
 		}
 	}
 
