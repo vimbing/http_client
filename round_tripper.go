@@ -21,7 +21,8 @@ var errProtocolNegotiated = errors.New("protocol negotiated")
 type roundTripper struct {
 	sync.Mutex
 
-	clientHelloId utls.ClientHelloID
+	insecureSkipVerify bool
+	clientHelloId      utls.ClientHelloID
 
 	cachedConnections map[string]net.Conn
 	cachedTransports  map[string]http.RoundTripper
@@ -94,7 +95,12 @@ func (rt *roundTripper) dialTLS(ctx context.Context, network, addr string) (net.
 		host = addr
 	}
 
-	conn := utls.UClient(rawConn, &utls.Config{ServerName: host, InsecureSkipVerify: false}, rt.clientHelloId)
+	conn := utls.UClient(rawConn, &utls.Config{
+		ServerName:         host,
+		InsecureSkipVerify: rt.insecureSkipVerify,
+	},
+		rt.clientHelloId,
+	)
 
 	if err != nil {
 		_ = conn.Close()
@@ -148,22 +154,20 @@ func (rt *roundTripper) getDialTLSAddr(req *http.Request) string {
 	return net.JoinHostPort(req.URL.Host, "443") // we can assume port is 443 at this point
 }
 
-func newRoundTripper(clientHello utls.ClientHelloID, dialer ...proxy.ContextDialer) http.RoundTripper {
-	if len(dialer) > 0 {
-		return &roundTripper{
-			dialer: dialer[0],
-
-			clientHelloId:     clientHello,
-			cachedTransports:  make(map[string]http.RoundTripper),
-			cachedConnections: make(map[string]net.Conn),
-		}
-	} else {
-		return &roundTripper{
-			dialer: proxy.Direct,
-
-			clientHelloId:     clientHello,
-			cachedTransports:  make(map[string]http.RoundTripper),
-			cachedConnections: make(map[string]net.Conn),
-		}
+func newRoundTripper(clientHello utls.ClientHelloID, insecureSkipVerify bool, dialer ...proxy.ContextDialer) http.RoundTripper {
+	rt := &roundTripper{
+		dialer:             dialer[0],
+		insecureSkipVerify: insecureSkipVerify,
+		clientHelloId:      clientHello,
+		cachedTransports:   make(map[string]http.RoundTripper),
+		cachedConnections:  make(map[string]net.Conn),
 	}
+
+	if len(dialer) > 0 {
+		rt.dialer = dialer[0]
+	} else {
+		rt.dialer = proxy.Direct
+	}
+
+	return rt
 }

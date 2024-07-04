@@ -2,15 +2,13 @@ package http
 
 import (
 	http "github.com/vimbing/fhttp"
-	tls "github.com/vimbing/vutls"
 
 	"golang.org/x/net/proxy"
 )
 
 func newFhttpClient(cfg *Config) (*http.Client, error) {
 	client := &http.Client{
-		Timeout:   cfg.timeout,
-		Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: cfg.insecureSkipVerify}},
+		Timeout: cfg.timeout,
 	}
 
 	if !cfg.allowRedirect {
@@ -32,7 +30,11 @@ func newFhttpClient(cfg *Config) (*http.Client, error) {
 		return &http.Client{}, err
 	}
 
-	client.Transport = newRoundTripper(cfg.ja3, dialer)
+	client.Transport = newRoundTripper(
+		cfg.ja3,
+		cfg.insecureSkipVerify,
+		dialer,
+	)
 
 	return client, nil
 }
