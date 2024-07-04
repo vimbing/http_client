@@ -10,7 +10,7 @@ import (
 func newFhttpClient(cfg *Config) (*http.Client, error) {
 	client := &http.Client{
 		Timeout:   cfg.timeout,
-		Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}},
+		Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: cfg.insecureSkipVerify}},
 	}
 
 	if !cfg.allowRedirect {
