@@ -1,7 +1,10 @@
 package http
 
 import (
+	"fmt"
 	"io"
+	urlLib "net/url"
+	"strings"
 
 	http "github.com/vimbing/fhttp"
 )
@@ -44,6 +47,20 @@ func (c *Client) newRequest(url string, options ...any) (*Request, error) {
 			req.Header = v
 		case io.Reader:
 			req.Body = v
+		case QueryParams:
+			values := urlLib.Values{}
+
+			for key, value := range v {
+				values.Add(key, value)
+			}
+
+			var joinChar = "?"
+
+			if strings.Contains(req.Url, "?") {
+				joinChar = "&"
+			}
+
+			req.Url = fmt.Sprintf("%s%s%s", req.Url, joinChar, values.Encode())
 		case RequestJsonBody:
 			body, err := marshalAndEncodeBody(v)
 
