@@ -42,7 +42,7 @@ func (c *Client) urlValues(v map[string]string) urlLib.Values {
 	return values
 }
 
-func (c *Client) newRequest(url string, options ...any) (*Request, error) {
+func (c *Client) NewRequest(url string, options ...any) (*Request, error) {
 	req := &Request{
 		Method: "GET",
 		Url:    url,
@@ -91,7 +91,7 @@ func (c *Client) newRequest(url string, options ...any) (*Request, error) {
 }
 
 func (c *Client) do(url string, options ...any) (*Response, error) {
-	req, err := c.newRequest(url, options...)
+	req, err := c.NewRequest(url, options...)
 
 	if err != nil {
 		return &Response{}, err
