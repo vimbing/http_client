@@ -31,7 +31,7 @@ func (c *Client) Do(req *Request) (*Response, error) {
 
 	res := &Response{}
 
-	req.retrier.Retry(func() error {
+	return res, req.retrier.Retry(func() error {
 		fhttpRes, err := c.fhttpClient.Do(req.fhttpRequest)
 
 		if err != nil {
@@ -65,8 +65,6 @@ func (c *Client) Do(req *Request) (*Response, error) {
 
 		return nil
 	})
-
-	return res, nil
 }
 
 func (c *Client) UseRequest(f RequestMiddlewareFunc) {
