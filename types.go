@@ -5,6 +5,7 @@ import (
 	"time"
 
 	fhttp "github.com/vimbing/fhttp"
+	"github.com/vimbing/retry"
 	tls "github.com/vimbing/vutls"
 )
 
@@ -46,6 +47,7 @@ type Request struct {
 	Header fhttp.Header
 	Url    string
 
+	retrier      *retry.Retrier
 	tlsProfile   *TlsProfile
 	fhttpRequest *fhttp.Request
 }

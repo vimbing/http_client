@@ -2,6 +2,8 @@ package http
 
 import (
 	"io"
+
+	"github.com/vimbing/retry"
 )
 
 func (c *Client) Do(req *Request) (*Response, error) {
@@ -23,36 +25,46 @@ func (c *Client) Do(req *Request) (*Response, error) {
 
 	defer reqCtxCancel()
 
-	fhttpRes, err := c.fhttpClient.Do(req.fhttpRequest)
-
-	if err != nil {
-		return &Response{}, err
+	if req.retrier == nil {
+		req.retrier = &retry.Retrier{Max: 1}
 	}
 
-	defer fhttpRes.Body.Close()
+	res := &Response{}
 
-	body, err := io.ReadAll(fhttpRes.Body)
+	req.retrier.Retry(func() error {
+		fhttpRes, err := c.fhttpClient.Do(req.fhttpRequest)
 
-	if err != nil {
-		return &Response{}, err
-	}
-
-	decodedBody, err := decodeResponseBody(fhttpRes.Header, body)
-
-	if err != nil {
-		return &Response{}, err
-	}
-
-	res := &Response{
-		Body:          decodedBody,
-		fhttpResponse: fhttpRes,
-	}
-
-	for _, m := range c.cfg.responseMiddleware {
-		if err := m(res); err != nil {
-			return &Response{}, err
+		if err != nil {
+			return err
 		}
-	}
+
+		defer fhttpRes.Body.Close()
+
+		body, err := io.ReadAll(fhttpRes.Body)
+
+		if err != nil {
+			return err
+		}
+
+		decodedBody, err := decodeResponseBody(fhttpRes.Header, body)
+
+		if err != nil {
+			return err
+		}
+
+		res = &Response{
+			Body:          decodedBody,
+			fhttpResponse: fhttpRes,
+		}
+
+		for _, m := range c.cfg.responseMiddleware {
+			if err := m(res); err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
 
 	return res, nil
 }

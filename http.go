@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	http "github.com/vimbing/fhttp"
+	"github.com/vimbing/retry"
 )
 
 func (c *Client) reinitFhttpClient() error {
@@ -73,6 +74,8 @@ func (c *Client) newRequest(url string, options ...any) (*Request, error) {
 			if len(req.Header.Get("content-type")) == 0 {
 				req.Header.Set("content-type", "application/x-www-form-urlencoded")
 			}
+		case retry.Retrier:
+			req.retrier = &v
 		case RequestJsonBody:
 			body, err := marshalAndEncodeBody(v)
 
