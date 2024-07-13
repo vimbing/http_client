@@ -38,6 +38,7 @@ type Config struct {
 
 type RequestJsonBody any
 type QueryParams map[string]string
+type FormUrlEncoded map[string]string
 
 type Request struct {
 	Method string

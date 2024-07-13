@@ -31,6 +31,16 @@ func (c *Client) reinitFhttpClient() error {
 	return err
 }
 
+func (c *Client) urlValues(v map[string]string) urlLib.Values {
+	values := urlLib.Values{}
+
+	for key, value := range v {
+		values.Add(key, value)
+	}
+
+	return values
+}
+
 func (c *Client) newRequest(url string, options ...any) (*Request, error) {
 	req := &Request{
 		Method: "GET",
@@ -48,11 +58,7 @@ func (c *Client) newRequest(url string, options ...any) (*Request, error) {
 		case io.Reader:
 			req.Body = v
 		case QueryParams:
-			values := urlLib.Values{}
-
-			for key, value := range v {
-				values.Add(key, value)
-			}
+			values := c.urlValues(v)
 
 			var joinChar = "?"
 
@@ -61,6 +67,12 @@ func (c *Client) newRequest(url string, options ...any) (*Request, error) {
 			}
 
 			req.Url = fmt.Sprintf("%s%s%s", req.Url, joinChar, values.Encode())
+		case FormUrlEncoded:
+			req.Body = strings.NewReader(c.urlValues(v).Encode())
+
+			if len(req.Header.Get("content-type")) == 0 {
+				req.Header.Set("content-type", "application/x-www-form-urlencoded")
+			}
 		case RequestJsonBody:
 			body, err := marshalAndEncodeBody(v)
 
