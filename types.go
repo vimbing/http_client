@@ -5,6 +5,7 @@ import (
 	"time"
 
 	fhttp "github.com/vimbing/fhttp"
+	"github.com/vimbing/fhttp/cookiejar"
 	"github.com/vimbing/retry"
 	tls "github.com/vimbing/vutls"
 )
@@ -17,6 +18,7 @@ type OptionUtlsJa3HelloId tls.ClientHelloID
 type OptionUtlsJa3HelloSpec tls.ClientHelloSpec
 type OptionTlsProfile TlsProfile
 type OptionInsecureSkipVerify bool
+type OptionCookieJar *cookiejar.Jar
 
 type Client struct {
 	fhttpClient *fhttp.Client
@@ -35,6 +37,7 @@ type Config struct {
 	timeout            time.Duration
 	ja3                tls.ClientHelloID
 	tlsProfile         *TlsProfile
+	jar                *cookiejar.Jar
 }
 
 type RequestJsonBody any

@@ -5,6 +5,7 @@ import (
 
 	"github.com/repeale/fp-go"
 	lo "github.com/samber/lo"
+	"github.com/vimbing/fhttp/cookiejar"
 	tls "github.com/vimbing/vutls"
 )
 
@@ -45,12 +46,17 @@ func WithInsecureSkipVerify() OptionInsecureSkipVerify {
 	return OptionInsecureSkipVerify(true)
 }
 
+func WithCookieJar(jar *cookiejar.Jar) OptionCookieJar {
+	return OptionCookieJar(jar)
+}
+
 func parseOptions(options ...any) *Config {
 	defaultCfg := &Config{
 		proxies:       []string{},
 		allowRedirect: true,
 		timeout:       time.Second * 15,
 		ja3:           tls.HelloChrome_120,
+		jar:           nil,
 	}
 
 	for _, opt := range options {
@@ -61,6 +67,8 @@ func parseOptions(options ...any) *Config {
 			defaultCfg.proxies = fp.Map(func(p OptionProxy) string { return string(p) })(v)
 		case OptionDisallowRedirect:
 			defaultCfg.allowRedirect = false
+		case OptionCookieJar:
+			defaultCfg.jar = v
 		case OptionTimeout:
 			defaultCfg.timeout = time.Duration(v)
 		case OptionUtlsJa3HelloId:
