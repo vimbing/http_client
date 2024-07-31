@@ -3,6 +3,8 @@ package http
 import (
 	"encoding/json"
 	"fmt"
+
+	fhttp "github.com/vimbing/fhttp"
 )
 
 func (r *Response) StatusCode() int {
@@ -44,4 +46,8 @@ func (r *Response) BodyBytes() []byte {
 // just for logging purposes
 func (r *Response) StatusError() error {
 	return fmt.Errorf("server responded with unexpected status code: %d", r.fhttpResponse.StatusCode)
+}
+
+func (r *Response) Headers() fhttp.Header {
+	return r.fhttpResponse.Header
 }
