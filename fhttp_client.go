@@ -36,5 +36,7 @@ func newFhttpClient(cfg *Config) (*http.Client, error) {
 		dialer,
 	)
 
+	client.Timeout = cfg.timeout
+
 	return client, nil
 }
