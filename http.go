@@ -16,7 +16,11 @@ func (c *Client) reinitFhttpClient() error {
 	if c.fhttpClient != nil {
 		jarCopy = c.fhttpClient.Jar
 	} else {
-		jarCopy = c.cfg.jar
+		if c.cfg.jar == nil {
+			jarCopy = nil
+		} else {
+			jarCopy = c.cfg.jar
+		}
 	}
 
 	newClient, err := newFhttpClient(c.cfg)
