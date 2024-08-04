@@ -50,11 +50,11 @@ func WithCookieJar(jar *cookiejar.Jar) OptionCookieJar {
 	return OptionCookieJar(jar)
 }
 
-func WithRequestMiddleware(m RequestMiddlewareFunc) OptionRequestMiddleware {
+func WithRequestMiddleware(m ...RequestMiddlewareFunc) OptionRequestMiddleware {
 	return OptionRequestMiddleware(m)
 }
 
-func WithResponseMiddleware(m ResponseMiddlewareFunc) OptionResponseMiddleware {
+func WithResponseMiddleware(m ...ResponseMiddlewareFunc) OptionResponseMiddleware {
 	return OptionResponseMiddleware(m)
 }
 
@@ -78,9 +78,13 @@ func parseOptions(options ...any) *Config {
 		case OptionCookieJar:
 			defaultCfg.jar = v
 		case OptionResponseMiddleware:
-			defaultCfg.responseMiddleware = append(defaultCfg.responseMiddleware, ResponseMiddlewareFunc(v))
+			for _, m := range v {
+				defaultCfg.responseMiddleware = append(defaultCfg.responseMiddleware, ResponseMiddlewareFunc(m))
+			}
 		case OptionRequestMiddleware:
-			defaultCfg.requestMiddleware = append(defaultCfg.requestMiddleware, RequestMiddlewareFunc(v))
+			for _, m := range v {
+				defaultCfg.requestMiddleware = append(defaultCfg.requestMiddleware, RequestMiddlewareFunc(m))
+			}
 		case OptionTimeout:
 			defaultCfg.timeout = time.Duration(v)
 		case OptionUtlsJa3HelloId:
