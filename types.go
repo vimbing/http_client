@@ -19,6 +19,8 @@ type OptionUtlsJa3HelloSpec tls.ClientHelloSpec
 type OptionTlsProfile TlsProfile
 type OptionInsecureSkipVerify bool
 type OptionCookieJar *cookiejar.Jar
+type OptionRequestMiddleware RequestMiddlewareFunc
+type OptionResponseMiddleware ResponseMiddlewareFunc
 
 type Client struct {
 	fhttpClient *fhttp.Client

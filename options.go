@@ -50,6 +50,14 @@ func WithCookieJar(jar *cookiejar.Jar) OptionCookieJar {
 	return OptionCookieJar(jar)
 }
 
+func WithRequestMiddleware(m RequestMiddlewareFunc) OptionRequestMiddleware {
+	return OptionRequestMiddleware(m)
+}
+
+func WithResponseMiddleware(m ResponseMiddlewareFunc) OptionResponseMiddleware {
+	return OptionResponseMiddleware(m)
+}
+
 func parseOptions(options ...any) *Config {
 	defaultCfg := &Config{
 		proxies:       []string{},
@@ -69,6 +77,10 @@ func parseOptions(options ...any) *Config {
 			defaultCfg.allowRedirect = false
 		case OptionCookieJar:
 			defaultCfg.jar = v
+		case OptionResponseMiddleware:
+			defaultCfg.responseMiddleware = append(defaultCfg.responseMiddleware, ResponseMiddlewareFunc(v))
+		case OptionRequestMiddleware:
+			defaultCfg.requestMiddleware = append(defaultCfg.requestMiddleware, RequestMiddlewareFunc(v))
 		case OptionTimeout:
 			defaultCfg.timeout = time.Duration(v)
 		case OptionUtlsJa3HelloId:
