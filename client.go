@@ -80,3 +80,7 @@ func (c *Client) UseRequest(f RequestMiddlewareFunc) {
 func (c *Client) UseResponse(f ResponseMiddlewareFunc) {
 	c.cfg.responseMiddleware = append(c.cfg.responseMiddleware, f)
 }
+
+func (c *Client) UseResponseError(f ResponseErrorMiddlewareFunc) {
+	c.cfg.responseErrorMiddleware = append(c.cfg.responseErrorMiddleware, f)
+}
