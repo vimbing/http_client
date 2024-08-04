@@ -21,6 +21,7 @@ type OptionInsecureSkipVerify bool
 type OptionCookieJar *cookiejar.Jar
 type OptionRequestMiddleware []RequestMiddlewareFunc
 type OptionResponseMiddleware []ResponseMiddlewareFunc
+type OptionResponseErrorMiddleware []ResponseErrorMiddlewareFunc
 
 type Client struct {
 	fhttpClient *fhttp.Client
@@ -29,17 +30,19 @@ type Client struct {
 
 type RequestMiddlewareFunc func(*Request) error
 type ResponseMiddlewareFunc func(*Response) error
+type ResponseErrorMiddlewareFunc func(error)
 
 type Config struct {
-	insecureSkipVerify bool
-	requestMiddleware  []RequestMiddlewareFunc
-	responseMiddleware []ResponseMiddlewareFunc
-	proxies            []string
-	allowRedirect      bool
-	timeout            time.Duration
-	ja3                tls.ClientHelloID
-	tlsProfile         *TlsProfile
-	jar                *cookiejar.Jar
+	insecureSkipVerify      bool
+	requestMiddleware       []RequestMiddlewareFunc
+	responseMiddleware      []ResponseMiddlewareFunc
+	responseErrorMiddleware []ResponseErrorMiddlewareFunc
+	proxies                 []string
+	allowRedirect           bool
+	timeout                 time.Duration
+	ja3                     tls.ClientHelloID
+	tlsProfile              *TlsProfile
+	jar                     *cookiejar.Jar
 }
 
 type RequestJsonBody any

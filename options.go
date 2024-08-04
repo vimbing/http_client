@@ -58,6 +58,10 @@ func WithResponseMiddleware(m ...ResponseMiddlewareFunc) OptionResponseMiddlewar
 	return OptionResponseMiddleware(m)
 }
 
+func WithResponseErrorMiddleware(m ...ResponseErrorMiddlewareFunc) OptionResponseErrorMiddleware {
+	return OptionResponseErrorMiddleware(m)
+}
+
 func parseOptions(options ...any) *Config {
 	defaultCfg := &Config{
 		proxies:       []string{},
@@ -84,6 +88,10 @@ func parseOptions(options ...any) *Config {
 		case OptionRequestMiddleware:
 			for _, m := range v {
 				defaultCfg.requestMiddleware = append(defaultCfg.requestMiddleware, RequestMiddlewareFunc(m))
+			}
+		case OptionResponseErrorMiddleware:
+			for _, m := range v {
+				defaultCfg.responseErrorMiddleware = append(defaultCfg.responseErrorMiddleware, ResponseErrorMiddlewareFunc(m))
 			}
 		case OptionTimeout:
 			defaultCfg.timeout = time.Duration(v)
