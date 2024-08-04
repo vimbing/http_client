@@ -3,6 +3,7 @@ package http
 import (
 	"encoding/json"
 	"fmt"
+	"net/url"
 
 	fhttp "github.com/vimbing/fhttp"
 )
@@ -50,4 +51,12 @@ func (r *Response) StatusError() error {
 
 func (r *Response) Headers() fhttp.Header {
 	return r.fhttpResponse.Header
+}
+
+func (r *Response) Url() url.URL {
+	return *r.fhttpResponse.Request.URL
+}
+
+func (r *Response) OriginalResponse() *fhttp.Response {
+	return r.fhttpResponse
 }
