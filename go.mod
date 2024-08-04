@@ -7,7 +7,7 @@ require (
 	github.com/klauspost/compress v1.17.9
 	github.com/repeale/fp-go v0.11.1
 	github.com/samber/lo v1.39.0
-	github.com/vimbing/fhttp v0.0.0-20240613170153-a99bcbd4b4e3
+	github.com/vimbing/fhttp v0.0.0-20240804152344-d99a76a51631
 	github.com/vimbing/retry v0.0.0-20240429231038-75d39d3774db
 	github.com/vimbing/vutls v0.0.0-20240704104451-ccfd470ec97a
 	golang.org/x/net v0.26.0
