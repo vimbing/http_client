@@ -37,7 +37,7 @@ func (c *Client) Do(req *Request) (*Response, error) {
 		if err != nil {
 			if len(c.cfg.responseErrorMiddleware) > 0 {
 				for _, m := range c.cfg.responseErrorMiddleware {
-					m(err)
+					m(req, err)
 				}
 			}
 

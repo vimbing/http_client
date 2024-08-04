@@ -30,7 +30,7 @@ type Client struct {
 
 type RequestMiddlewareFunc func(*Request) error
 type ResponseMiddlewareFunc func(*Response) error
-type ResponseErrorMiddlewareFunc func(error)
+type ResponseErrorMiddlewareFunc func(*Request, error)
 
 type Config struct {
 	insecureSkipVerify      bool
