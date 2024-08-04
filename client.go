@@ -35,6 +35,12 @@ func (c *Client) Do(req *Request) (*Response, error) {
 		fhttpRes, err := c.fhttpClient.Do(req.fhttpRequest)
 
 		if err != nil {
+			if len(c.cfg.responseErrorMiddleware) > 0 {
+				for _, m := range c.cfg.responseErrorMiddleware {
+					m(err)
+				}
+			}
+
 			return err
 		}
 
