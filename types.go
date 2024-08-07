@@ -55,6 +55,7 @@ type Request struct {
 	Header fhttp.Header
 	Url    string
 
+	host         *string
 	retrier      *retry.Retrier
 	tlsProfile   *TlsProfile
 	fhttpRequest *fhttp.Request

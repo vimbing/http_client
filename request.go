@@ -35,15 +35,13 @@ func (r *Request) Build(timeout time.Duration) (context.CancelFunc, error) {
 	req.Header = r.Header
 	r.fhttpRequest = req
 
+	if r.host != nil {
+		r.fhttpRequest.Host = *r.host
+	}
+
 	return cancel, nil
 }
 
-func (r *Request) SetHost(host string) error {
-	if r.fhttpRequest == nil {
-		return ErrRequestNotInitiated
-	}
-
-	r.fhttpRequest.Host = host
-
-	return nil
+func (r *Request) SetHost(host string) {
+	r.host = &host
 }
