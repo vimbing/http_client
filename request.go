@@ -37,3 +37,13 @@ func (r *Request) Build(timeout time.Duration) (context.CancelFunc, error) {
 
 	return cancel, nil
 }
+
+func (r *Request) SetHost(host string) error {
+	if r.fhttpRequest == nil {
+		return ErrRequestNotInitiated
+	}
+
+	r.fhttpRequest.Host = host
+
+	return nil
+}
