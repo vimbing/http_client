@@ -24,6 +24,8 @@ github.com/vimbing/vutls v0.0.0-20240613165518-1256ec66cb9c h1:Mb+OIskJgbP/lcLdr
 github.com/vimbing/vutls v0.0.0-20240613165518-1256ec66cb9c/go.mod h1:wI/7DKod6JEeSfyksvKa8SHBW5A8Ailc8gXv0ScCJD4=
 github.com/vimbing/vutls v0.0.0-20240704104451-ccfd470ec97a h1:9+LdJYRF5ccVK2uyXcKZJGRSZDqARnKd7mLAmXlP2Vg=
 github.com/vimbing/vutls v0.0.0-20240704104451-ccfd470ec97a/go.mod h1:wI/7DKod6JEeSfyksvKa8SHBW5A8Ailc8gXv0ScCJD4=
+github.com/vimbing/vutls v0.0.0-20240902113529-00c5ac442d95 h1:5iMSZoz5yEgfKBBXsIiESyuNNF247TArOtsYp3s0MpQ=
+github.com/vimbing/vutls v0.0.0-20240902113529-00c5ac442d95/go.mod h1:wI/7DKod6JEeSfyksvKa8SHBW5A8Ailc8gXv0ScCJD4=
 golang.org/x/crypto v0.24.0 h1:mnl8DM0o513X8fdIkmyFE/5hTYxbwYOjDS/+rK6qpRI=
 golang.org/x/crypto v0.24.0/go.mod h1:Z1PMYSOR5nyMcyAVAIQSKCDwalqy85Aqn1x3Ws4L5DM=
 golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17 h1:3MTrJm4PyNL9NBqvYDSj3DHl46qQakyfqfWo4jgfaEM=
