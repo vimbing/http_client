@@ -8,14 +8,21 @@ import (
 )
 
 func (r *Request) useTlsProfile() {
-	if r.tlsProfile == nil {
+	if r.tlsProfile.Headers == nil {
 		return
 	}
 
-	r.Header.Set("sec-ch-ua", r.tlsProfile.SecChUa)
-	r.Header.Set("sec-ch-ua-mobile", r.tlsProfile.SecChUaMobile)
-	r.Header.Set("sec-ch-ua-platform", r.tlsProfile.SecChaUaPlatform)
-	r.Header.Set("user-agent", r.tlsProfile.UserAgent)
+	for k, v := range r.tlsProfile.Headers {
+		r.Header[k] = v
+	}
+
+	if len(r.tlsProfile.HeaderOrder) > 0 {
+		r.Header[fhttp.HeaderOrderKey] = r.tlsProfile.HeaderOrder
+	}
+
+	if len(r.tlsProfile.PseudoHeaderOrder) > 0 {
+		r.Header[fhttp.PHeaderOrderKey] = r.tlsProfile.PseudoHeaderOrder
+	}
 }
 
 func (r *Request) Build(timeout time.Duration) (context.CancelFunc, error) {

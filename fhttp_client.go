@@ -30,11 +30,21 @@ func newFhttpClient(cfg *Config) (*http.Client, error) {
 		return &http.Client{}, err
 	}
 
-	client.Transport = newRoundTripper(
+	/*
+
 		cfg.ja3,
-		cfg.insecureSkipVerify,
-		dialer,
-	)
+			cfg.insecureSkipVerify,
+			dialer,
+	*/
+
+	client.Transport = newRoundTripper(roundTripperSettings{
+		clientHello:        cfg.ja3,
+		insecureSkipVerify: cfg.insecureSkipVerify,
+		dialer:             dialer,
+		http2Settings:      cfg.httpSettings.Settings,
+		http2SettingsOrder: cfg.httpSettings.Order,
+		disablePush:        cfg.httpSettings.DisablePush,
+	})
 
 	client.Timeout = cfg.timeout
 

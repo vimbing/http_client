@@ -62,6 +62,10 @@ func WithResponseErrorMiddleware(m ...ResponseErrorMiddlewareFunc) OptionRespons
 	return OptionResponseErrorMiddleware(m)
 }
 
+func WithHttpSettings(settings Http2Settings) OptionHttpSettings {
+	return OptionHttpSettings(settings)
+}
+
 func parseOptions(options ...any) *Config {
 	defaultCfg := &Config{
 		proxies:       []string{},
@@ -97,9 +101,12 @@ func parseOptions(options ...any) *Config {
 			defaultCfg.timeout = time.Duration(v)
 		case OptionUtlsJa3HelloId:
 			defaultCfg.ja3 = tls.ClientHelloID(v)
+		case OptionHttpSettings:
+			defaultCfg.httpSettings = Http2Settings(v)
 		case OptionTlsProfile:
 			profile := TlsProfile(v)
 			defaultCfg.tlsProfile = &profile
+			defaultCfg.httpSettings = profile.Http2Settings
 		case OptionInsecureSkipVerify:
 			defaultCfg.insecureSkipVerify = true
 		}

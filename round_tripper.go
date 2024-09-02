@@ -28,6 +28,10 @@ type roundTripper struct {
 	cachedTransports  map[string]http.RoundTripper
 
 	dialer proxy.ContextDialer
+
+	http2Settings      map[http2.SettingID]uint32
+	http2SettingsOrder []http2.SettingID
+	disablePush        bool
 }
 
 func (rt *roundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
@@ -119,16 +123,32 @@ func (rt *roundTripper) dialTLS(ctx context.Context, network, addr string) (net.
 	// No http.Transport constructed yet, create one based on the results
 	// of ALPN.
 	switch conn.ConnectionState().NegotiatedProtocol {
+
 	case http2.NextProtoTLS:
 		t2 := http2.Transport{DialTLS: rt.dialTLSHTTP2}
-		t2.HeaderTableSize = 65536
 
-		t2.Settings = []http2.Setting{
-			{ID: http2.SettingMaxConcurrentStreams, Val: 1000},
-			{ID: http2.SettingMaxHeaderListSize, Val: 262144},
+		if len(rt.http2Settings) == 0 || len(rt.http2SettingsOrder) == 0 {
+			t2.HeaderTableSize = 65536
+
+			t2.Settings = []http2.Setting{
+				{ID: http2.SettingMaxConcurrentStreams, Val: 1000},
+				{ID: http2.SettingMaxHeaderListSize, Val: 262144},
+			}
+
+			t2.InitialWindowSize = 6291456
+		} else {
+			for _, settingId := range rt.http2SettingsOrder {
+				t2.Settings = append(t2.Settings, http2.Setting{
+					ID:  settingId,
+					Val: rt.http2Settings[settingId],
+				})
+			}
 		}
-		t2.InitialWindowSize = 6291456
-		t2.PushHandler = &http2.DefaultPushHandler{}
+
+		if !rt.disablePush {
+			t2.PushHandler = &http2.DefaultPushHandler{}
+		}
+
 		rt.cachedTransports[addr] = &t2
 	default:
 		// Assume the remote peer is speaking HTTP 1.x + TLS.
@@ -154,20 +174,24 @@ func (rt *roundTripper) getDialTLSAddr(req *http.Request) string {
 	return net.JoinHostPort(req.URL.Host, "443") // we can assume port is 443 at this point
 }
 
-func newRoundTripper(clientHello utls.ClientHelloID, insecureSkipVerify bool, dialer ...proxy.ContextDialer) http.RoundTripper {
-	rt := &roundTripper{
-		dialer:             dialer[0],
-		insecureSkipVerify: insecureSkipVerify,
-		clientHelloId:      clientHello,
+type roundTripperSettings struct {
+	clientHello        utls.ClientHelloID
+	insecureSkipVerify bool
+	dialer             proxy.ContextDialer
+	http2Settings      map[http2.SettingID]uint32
+	http2SettingsOrder []http2.SettingID
+	disablePush        bool
+}
+
+func newRoundTripper(settings roundTripperSettings) http.RoundTripper {
+	return &roundTripper{
+		dialer:             settings.dialer,
+		insecureSkipVerify: settings.insecureSkipVerify,
+		clientHelloId:      settings.clientHello,
 		cachedTransports:   make(map[string]http.RoundTripper),
 		cachedConnections:  make(map[string]net.Conn),
+		http2Settings:      settings.http2Settings,
+		http2SettingsOrder: settings.http2SettingsOrder,
+		disablePush:        settings.disablePush,
 	}
-
-	if len(dialer) > 0 {
-		rt.dialer = dialer[0]
-	} else {
-		rt.dialer = proxy.Direct
-	}
-
-	return rt
 }

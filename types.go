@@ -6,6 +6,7 @@ import (
 
 	fhttp "github.com/vimbing/fhttp"
 	"github.com/vimbing/fhttp/cookiejar"
+	"github.com/vimbing/fhttp/http2"
 	"github.com/vimbing/retry"
 	tls "github.com/vimbing/vutls"
 )
@@ -22,6 +23,7 @@ type OptionCookieJar *cookiejar.Jar
 type OptionRequestMiddleware []RequestMiddlewareFunc
 type OptionResponseMiddleware []ResponseMiddlewareFunc
 type OptionResponseErrorMiddleware []ResponseErrorMiddlewareFunc
+type OptionHttpSettings Http2Settings
 
 type Client struct {
 	fhttpClient *fhttp.Client
@@ -31,6 +33,12 @@ type Client struct {
 type RequestMiddlewareFunc func(*Request) error
 type ResponseMiddlewareFunc func(*Response) error
 type ResponseErrorMiddlewareFunc func(*Request, error)
+
+type Http2Settings struct {
+	Order       []http2.SettingID
+	Settings    map[http2.SettingID]uint32
+	DisablePush bool
+}
 
 type Config struct {
 	insecureSkipVerify      bool
@@ -43,6 +51,7 @@ type Config struct {
 	ja3                     tls.ClientHelloID
 	tlsProfile              *TlsProfile
 	jar                     *cookiejar.Jar
+	httpSettings            Http2Settings
 }
 
 type RequestJsonBody any
@@ -67,8 +76,8 @@ type Response struct {
 }
 
 type TlsProfile struct {
-	SecChUa          string
-	SecChUaMobile    string
-	SecChaUaPlatform string
-	UserAgent        string
+	Headers           fhttp.Header
+	Http2Settings     Http2Settings
+	HeaderOrder       []string
+	PseudoHeaderOrder []string
 }
