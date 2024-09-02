@@ -9,7 +9,7 @@ require (
 	github.com/samber/lo v1.39.0
 	github.com/vimbing/fhttp v0.0.0-20240902131043-367aeb508300
 	github.com/vimbing/retry v0.0.0-20240429231038-75d39d3774db
-	github.com/vimbing/vutls v0.0.0-20240902113529-00c5ac442d95
+	github.com/vimbing/vutls v0.0.0-20240902151909-dad8a20f702b
 	golang.org/x/net v0.26.0
 )
 
