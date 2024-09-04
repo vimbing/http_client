@@ -8,7 +8,7 @@ import (
 )
 
 func (r *Request) useTlsProfile() {
-	if r.tlsProfile.Headers == nil {
+	if r.tlsProfile == nil || r.tlsProfile.Headers == nil {
 		return
 	}
 
