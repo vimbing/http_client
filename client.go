@@ -1,6 +1,7 @@
 package http
 
 import (
+	"bytes"
 	"errors"
 	"io"
 
@@ -28,7 +29,7 @@ func (c *Client) executeRequest(req *Request, resultChan chan *requestExecutionR
 
 	defer fhttpRes.Body.Close()
 
-	body, err := io.ReadAll(fhttpRes.Body)
+	decodedBody, err := decodeResponseBody(fhttpRes.Header, fhttpRes.Body)
 
 	if err != nil {
 		resultChan <- &requestExecutionResult{
@@ -38,9 +39,10 @@ func (c *Client) executeRequest(req *Request, resultChan chan *requestExecutionR
 		return
 	}
 
-	decodedBody, err := decodeResponseBody(fhttpRes.Header, body)
+	buff := bytes.NewBuffer([]byte{})
+	defer buff.Reset()
 
-	if err != nil {
+	if _, err := io.Copy(buff, decodedBody); err != nil {
 		resultChan <- &requestExecutionResult{
 			error: err,
 		}
@@ -49,7 +51,7 @@ func (c *Client) executeRequest(req *Request, resultChan chan *requestExecutionR
 	}
 
 	res := &Response{
-		Body:          decodedBody,
+		Body:          buff.Bytes(),
 		fhttpResponse: fhttpRes,
 	}
 
