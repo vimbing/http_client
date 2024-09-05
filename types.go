@@ -81,3 +81,8 @@ type TlsProfile struct {
 	HeaderOrder       []string
 	PseudoHeaderOrder []string
 }
+
+type requestExecutionResult struct {
+	res   *Response
+	error error
+}

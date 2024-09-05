@@ -14,6 +14,8 @@ github.com/vimbing/retry v0.0.0-20240429231038-75d39d3774db h1:3unER8Y6uLCI3ahto
 github.com/vimbing/retry v0.0.0-20240429231038-75d39d3774db/go.mod h1:KpRUUhEkH+ulbRjS7M/RnWODdcvvoPxr5HeZLRyqACc=
 github.com/vimbing/vutls v0.0.0-20240902151909-dad8a20f702b h1:z5xfgfICff5u4hjfYklWLmM2mn352ONr61zTU94N/d4=
 github.com/vimbing/vutls v0.0.0-20240902151909-dad8a20f702b/go.mod h1:wI/7DKod6JEeSfyksvKa8SHBW5A8Ailc8gXv0ScCJD4=
+github.com/vimbing/vutls v0.0.0-20240902153036-41c8e3cded8d h1:qrEzuO+by4lphp+iEBn/NtkrgoTt5Cok9/E5E9aLSm8=
+github.com/vimbing/vutls v0.0.0-20240902153036-41c8e3cded8d/go.mod h1:wI/7DKod6JEeSfyksvKa8SHBW5A8Ailc8gXv0ScCJD4=
 golang.org/x/crypto v0.24.0 h1:mnl8DM0o513X8fdIkmyFE/5hTYxbwYOjDS/+rK6qpRI=
 golang.org/x/crypto v0.24.0/go.mod h1:Z1PMYSOR5nyMcyAVAIQSKCDwalqy85Aqn1x3Ws4L5DM=
 golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17 h1:3MTrJm4PyNL9NBqvYDSj3DHl46qQakyfqfWo4jgfaEM=

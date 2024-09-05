@@ -1,10 +1,74 @@
 package http
 
 import (
+	"errors"
 	"io"
 
 	"github.com/vimbing/retry"
 )
+
+func (c *Client) executeRequest(req *Request, resultChan chan *requestExecutionResult) {
+	defer close(resultChan)
+
+	fhttpRes, err := c.fhttpClient.Do(req.fhttpRequest)
+
+	if err != nil {
+		if len(c.cfg.responseErrorMiddleware) > 0 {
+			for _, m := range c.cfg.responseErrorMiddleware {
+				m(req, err)
+			}
+		}
+
+		resultChan <- &requestExecutionResult{
+			error: err,
+		}
+
+		return
+	}
+
+	defer fhttpRes.Body.Close()
+
+	body, err := io.ReadAll(fhttpRes.Body)
+
+	if err != nil {
+		resultChan <- &requestExecutionResult{
+			error: err,
+		}
+
+		return
+	}
+
+	decodedBody, err := decodeResponseBody(fhttpRes.Header, body)
+
+	if err != nil {
+		resultChan <- &requestExecutionResult{
+			error: err,
+		}
+
+		return
+	}
+
+	res := &Response{
+		Body:          decodedBody,
+		fhttpResponse: fhttpRes,
+	}
+
+	for _, m := range c.cfg.responseMiddleware {
+		if err := m(res); err != nil {
+			resultChan <- &requestExecutionResult{
+				res:   res,
+				error: err,
+			}
+
+			return
+		}
+	}
+
+	resultChan <- &requestExecutionResult{
+		res:   res,
+		error: err,
+	}
+}
 
 func (c *Client) Do(req *Request) (*Response, error) {
 	for _, m := range c.cfg.requestMiddleware {
@@ -15,15 +79,15 @@ func (c *Client) Do(req *Request) (*Response, error) {
 
 	req.tlsProfile = c.cfg.tlsProfile
 
-	reqCtxCancel, err := req.Build(
+	ctx, reqCtxCancel, err := req.Build(
 		c.cfg.timeout,
 	)
+
+	defer reqCtxCancel()
 
 	if err != nil {
 		return &Response{}, err
 	}
-
-	defer reqCtxCancel()
 
 	if req.retrier == nil {
 		req.retrier = &retry.Retrier{Max: 1}
@@ -32,44 +96,19 @@ func (c *Client) Do(req *Request) (*Response, error) {
 	res := &Response{}
 
 	return res, req.retrier.Retry(func() error {
-		fhttpRes, err := c.fhttpClient.Do(req.fhttpRequest)
+		resultChan := make(chan *requestExecutionResult, 1)
 
-		if err != nil {
-			if len(c.cfg.responseErrorMiddleware) > 0 {
-				for _, m := range c.cfg.responseErrorMiddleware {
-					m(req, err)
-				}
-			}
+		go c.executeRequest(req, resultChan)
 
-			return err
-		}
-
-		defer fhttpRes.Body.Close()
-
-		body, err := io.ReadAll(fhttpRes.Body)
-
-		if err != nil {
-			return err
-		}
-
-		decodedBody, err := decodeResponseBody(fhttpRes.Header, body)
-
-		if err != nil {
-			return err
-		}
-
-		res = &Response{
-			Body:          decodedBody,
-			fhttpResponse: fhttpRes,
-		}
-
-		for _, m := range c.cfg.responseMiddleware {
-			if err := m(res); err != nil {
-				return err
+		for {
+			select {
+			case result := <-resultChan:
+				res = result.res
+				return result.error
+			case <-ctx.Done():
+				return errors.New("context cancelled")
 			}
 		}
-
-		return nil
 	})
 }
 
