@@ -46,6 +46,12 @@ func (r *Request) Build(timeout time.Duration) (context.Context, context.CancelF
 		r.fhttpRequest.Host = *r.host
 	}
 
+	if len(r.proto) > 0 {
+		req.Proto = r.proto
+		req.ProtoMajor = r.protoMajor
+		req.ProtoMinor = r.protoMinor
+	}
+
 	return ctx, cancel, nil
 }
 
@@ -54,7 +60,7 @@ func (r *Request) SetHost(host string) {
 }
 
 func (r *Request) SetProto(proto string, major int, minor int) {
-	r.fhttpRequest.Proto = proto
-	r.fhttpRequest.ProtoMajor = major
-	r.fhttpRequest.ProtoMinor = minor
+	r.proto = proto
+	r.protoMajor = major
+	r.protoMinor = minor
 }
