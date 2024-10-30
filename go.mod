@@ -16,6 +16,9 @@ require (
 
 require (
 	github.com/cloudflare/circl v1.3.9 // indirect
+	github.com/refraction-networking/utls v1.1.6-0.20221101174805-9c1996abbbba // indirect
+	github.com/saucesteals/fhttp v0.0.0-20240117034418-b4f835e6c226 // indirect
+	github.com/saucesteals/mimic v0.0.0-20240117034535-a989cf81feec // indirect
 	go.uber.org/atomic v1.7.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
 	golang.org/x/crypto v0.24.0 // indirect

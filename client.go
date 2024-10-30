@@ -5,8 +5,13 @@ import (
 	"errors"
 	"io"
 
+	"github.com/vimbing/fhttp/cookiejar"
 	"github.com/vimbing/retry"
 )
+
+func (c *Client) BindJar(jar *cookiejar.Jar) {
+	c.fhttpClient.Jar = jar
+}
 
 func (c *Client) executeRequest(req *Request, resultChan chan *requestExecutionResult) {
 	defer close(resultChan)
