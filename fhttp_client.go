@@ -1,6 +1,11 @@
 package http
 
 import (
+	"errors"
+	"net"
+	"strings"
+	"time"
+
 	http "github.com/vimbing/fhttp"
 
 	"golang.org/x/net/proxy"
@@ -21,7 +26,26 @@ func newFhttpClient(cfg *Config) (*http.Client, error) {
 	var err error
 
 	if len(cfg.proxies) > 0 {
-		dialer, err = newConnectDialer(cfg.proxies[RandomInt(0, len(cfg.proxies))])
+		if strings.Contains(cfg.proxies[0], "socks") {
+			dialSocksProxy, err := proxy.SOCKS5("tcp", cfg.proxies[RandomInt(0, len(cfg.proxies))], nil, &net.Dialer{
+				Timeout:   30 * time.Second,
+				KeepAlive: 30 * time.Second,
+			})
+
+			if err != nil {
+				return client, err
+			}
+
+			var ok bool
+
+			dialer, ok = dialSocksProxy.(proxy.ContextDialer)
+
+			if !ok {
+				return client, errors.New("failed type assertion to DialContext")
+			}
+		} else {
+			dialer, err = newConnectDialer(cfg.proxies[RandomInt(0, len(cfg.proxies))])
+		}
 	} else {
 		dialer = proxy.Direct
 	}

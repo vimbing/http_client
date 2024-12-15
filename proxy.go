@@ -30,3 +30,18 @@ func parseList(list []string) []OptionProxy {
 
 	return parsedList
 }
+
+func parseSingleSocksProxy(rawProxy string) (OptionProxy, error) {
+	parsedHttp, err := parseSingleProxy(rawProxy)
+
+	if err != nil {
+		return "", err
+	}
+
+	return OptionProxy(strings.Replace(
+		string(parsedHttp),
+		"http",
+		"socks5",
+		-1,
+	)), nil
+}

@@ -22,6 +22,11 @@ func WithProxy(proxy string) OptionProxy {
 	return OptionProxy(parsed)
 }
 
+func WithProxySocks(proxy string) OptionProxy {
+	parsed, _ := parseSingleSocksProxy(proxy)
+	return OptionProxy(parsed)
+}
+
 func WithProxyParsed(proxy string) OptionProxy {
 	return OptionProxy(proxy)
 }
