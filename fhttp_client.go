@@ -3,6 +3,7 @@ package http
 import (
 	"errors"
 	"net"
+	"net/url"
 	"strings"
 	"time"
 
@@ -26,8 +27,30 @@ func newFhttpClient(cfg *Config) (*http.Client, error) {
 	var err error
 
 	if len(cfg.proxies) > 0 {
+		pickedProxy := cfg.proxies[RandomInt(0, len(cfg.proxies))]
+
 		if strings.Contains(cfg.proxies[0], "socks") {
-			dialSocksProxy, err := proxy.SOCKS5("tcp", cfg.proxies[RandomInt(0, len(cfg.proxies))], nil, &net.Dialer{
+			proxyUrl, err := url.Parse(pickedProxy)
+
+			if err != nil {
+				return client, err
+			}
+
+			var auth *proxy.Auth
+
+			if proxyUrl.User != nil && len(proxyUrl.User.Username()) > 0 {
+				password, passwordSet := proxyUrl.User.Password()
+
+				auth = &proxy.Auth{
+					User: proxyUrl.User.Username(),
+				}
+
+				if passwordSet {
+					auth.Password = password
+				}
+			}
+
+			dialSocksProxy, err := proxy.SOCKS5("tcp", proxyUrl.Host, auth, &net.Dialer{
 				Timeout:   30 * time.Second,
 				KeepAlive: 30 * time.Second,
 			})
@@ -44,7 +67,7 @@ func newFhttpClient(cfg *Config) (*http.Client, error) {
 				return client, errors.New("failed type assertion to DialContext")
 			}
 		} else {
-			dialer, err = newConnectDialer(cfg.proxies[RandomInt(0, len(cfg.proxies))])
+			dialer, err = newConnectDialer(pickedProxy)
 		}
 	} else {
 		dialer = proxy.Direct
