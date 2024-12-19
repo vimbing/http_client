@@ -84,6 +84,7 @@ type TlsProfile struct {
 	Http2Settings     Http2Settings
 	HeaderOrder       []string
 	PseudoHeaderOrder []string
+	Ja3               tls.ClientHelloID
 }
 
 type requestExecutionResult struct {
