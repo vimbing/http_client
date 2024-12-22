@@ -10,6 +10,7 @@ import (
 )
 
 func (c *Client) BindJar(jar *cookiejar.Jar) {
+	c.cfg.jar = jar
 	c.fhttpClient.Jar = jar
 }
 

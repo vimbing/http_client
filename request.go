@@ -7,31 +7,11 @@ import (
 	fhttp "github.com/vimbing/fhttp"
 )
 
-func (r *Request) useTlsProfile() {
-	if r.tlsProfile == nil {
-		return
-	}
-
-	for k, v := range r.tlsProfile.Headers {
-		r.Header[k] = v
-	}
-
-	if len(r.tlsProfile.HeaderOrder) > 0 {
-		r.Header[fhttp.HeaderOrderKey] = r.tlsProfile.HeaderOrder
-	}
-
-	if len(r.tlsProfile.PseudoHeaderOrder) > 0 {
-		r.Header[fhttp.PHeaderOrderKey] = r.tlsProfile.PseudoHeaderOrder
-	}
-}
-
 func (r *Request) Build(timeout time.Duration) (context.Context, context.CancelFunc, error) {
 	ctx, cancel := context.WithTimeout(
 		context.Background(),
 		timeout,
 	)
-
-	r.useTlsProfile()
 
 	req, err := fhttp.NewRequestWithContext(ctx, r.Method, r.Url, r.Body)
 

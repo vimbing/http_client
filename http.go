@@ -11,18 +11,6 @@ import (
 )
 
 func (c *Client) reinitFhttpClient() error {
-	var jarCopy http.CookieJar
-
-	if c.fhttpClient != nil {
-		jarCopy = c.fhttpClient.Jar
-	} else {
-		if c.cfg.jar == nil {
-			jarCopy = nil
-		} else {
-			jarCopy = c.cfg.jar
-		}
-	}
-
 	if c.cfg.tlsProfile != nil && c.cfg.tlsProfile.Ja3.IsSet() {
 		c.cfg.ja3 = c.cfg.tlsProfile.Ja3
 	}
@@ -33,11 +21,11 @@ func (c *Client) reinitFhttpClient() error {
 		return err
 	}
 
-	if jarCopy != nil {
-		newClient.Jar = jarCopy
-	}
-
 	c.fhttpClient = newClient
+
+	if c.fhttpClient != nil && c.cfg.jar != nil {
+		c.fhttpClient.Jar = c.cfg.jar
+	}
 
 	return err
 }
