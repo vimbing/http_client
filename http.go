@@ -23,7 +23,7 @@ func (c *Client) reinitFhttpClient() error {
 		}
 	}
 
-	if c.cfg.tlsProfile.Ja3.IsSet() {
+	if c.cfg.tlsProfile != nil && c.cfg.tlsProfile.Ja3.IsSet() {
 		c.cfg.ja3 = c.cfg.tlsProfile.Ja3
 	}
 

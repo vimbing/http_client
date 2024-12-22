@@ -105,7 +105,7 @@ func (c *Client) Do(req *Request) (*Response, error) {
 	return res, req.retrier.Retry(func() error {
 		resultChan := make(chan *requestExecutionResult, 1)
 
-		if len(c.cfg.proxies) > 1 {
+		if len(c.cfg.proxies) > 1 || (len(c.cfg.proxies) > 0 && c.cfg.forceRotation) {
 			err := rebindRoundtripper(c.fhttpClient, c.cfg)
 
 			if err != nil {

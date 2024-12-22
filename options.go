@@ -9,6 +9,10 @@ import (
 	tls "github.com/vimbing/vutls"
 )
 
+func WithForcedProxyRotation() OptionForcedProxyRotation {
+	return true
+}
+
 func WithProxyList(proxyList []string) []OptionProxy {
 	return append([]OptionProxy{}, parseList(proxyList)...)
 }
@@ -82,6 +86,8 @@ func parseOptions(options ...any) *Config {
 
 	for _, opt := range options {
 		switch v := opt.(type) {
+		case OptionForcedProxyRotation:
+			defaultCfg.forceRotation = true
 		case OptionProxy:
 			defaultCfg.proxies = []string{string(v)}
 		case []OptionProxy:

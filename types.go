@@ -15,6 +15,7 @@ type OptionStringJa string
 type OptionTimeout time.Duration
 type OptionProxy string
 type OptionDisallowRedirect bool
+type OptionForcedProxyRotation bool
 type OptionUtlsJa3HelloId tls.ClientHelloID
 type OptionUtlsJa3HelloSpec tls.ClientHelloSpec
 type OptionTlsProfile TlsProfile
@@ -46,6 +47,7 @@ type Config struct {
 	responseMiddleware      []ResponseMiddlewareFunc
 	responseErrorMiddleware []ResponseErrorMiddlewareFunc
 	proxies                 []string
+	forceRotation           bool
 	allowRedirect           bool
 	timeout                 time.Duration
 	ja3                     tls.ClientHelloID
