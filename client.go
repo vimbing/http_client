@@ -105,6 +105,14 @@ func (c *Client) Do(req *Request) (*Response, error) {
 	return res, req.retrier.Retry(func() error {
 		resultChan := make(chan *requestExecutionResult, 1)
 
+		if len(c.cfg.proxies) > 1 {
+			err := rebindRoundtripper(c.fhttpClient, c.cfg)
+
+			if err != nil {
+				return err
+			}
+		}
+
 		go c.executeRequest(req, resultChan)
 
 		for {
