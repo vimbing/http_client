@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 
+	"github.com/samber/lo"
 	"github.com/vimbing/fhttp/cookiejar"
 	"github.com/vimbing/retry"
 )
@@ -138,4 +139,25 @@ func (c *Client) UseResponse(f ResponseMiddlewareFunc) {
 
 func (c *Client) UseResponseError(f ResponseErrorMiddlewareFunc) {
 	c.cfg.responseErrorMiddleware = append(c.cfg.responseErrorMiddleware, f)
+}
+
+func (c *Client) ChangeProxy(proxy string) {
+	p, _ := parseSingleProxy(proxy)
+	c.cfg.proxies = []string{string(p)}
+	rebindRoundtripper(c.fhttpClient, c.cfg)
+}
+
+func (c *Client) ChangeProxyList(proxies []string) {
+	c.cfg.proxies = lo.Map(parseList(proxies), func(p OptionProxy, i int) string { return string(p) })
+	rebindRoundtripper(c.fhttpClient, c.cfg)
+}
+
+func (c *Client) ChangeProxyParsed(proxy string) {
+	c.cfg.proxies = []string{proxy}
+	rebindRoundtripper(c.fhttpClient, c.cfg)
+}
+
+func (c *Client) ChangeProxyListParsed(proxies []string) {
+	c.cfg.proxies = proxies
+	rebindRoundtripper(c.fhttpClient, c.cfg)
 }
