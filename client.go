@@ -79,6 +79,10 @@ func (c *Client) executeRequest(req *Request, resultChan chan *requestExecutionR
 	}
 }
 
+func (c *Client) RotateProxy() error {
+	return rebindRoundtripper(c.fhttpClient, c.cfg)
+}
+
 func (c *Client) Do(req *Request) (*Response, error) {
 	for _, m := range c.cfg.requestMiddleware {
 		if err := m(req); err != nil {
@@ -107,7 +111,7 @@ func (c *Client) Do(req *Request) (*Response, error) {
 	return res, req.retrier.Retry(func() error {
 		resultChan := make(chan *requestExecutionResult, 1)
 
-		if len(c.cfg.proxies) > 1 || (len(c.cfg.proxies) > 0 && c.cfg.forceRotation) {
+		if c.cfg.forceRotation {
 			err := rebindRoundtripper(c.fhttpClient, c.cfg)
 
 			if err != nil {
