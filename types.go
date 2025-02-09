@@ -25,6 +25,7 @@ type OptionRequestMiddleware []RequestMiddlewareFunc
 type OptionResponseMiddleware []ResponseMiddlewareFunc
 type OptionResponseErrorMiddleware []ResponseErrorMiddlewareFunc
 type OptionHttpSettings Http2Settings
+type OptionRetry *Retry
 
 type Client struct {
 	fhttpClient *fhttp.Client
@@ -54,6 +55,7 @@ type Config struct {
 	tlsProfile              *TlsProfile
 	jar                     *cookiejar.Jar
 	httpSettings            Http2Settings
+	retry                   *Retry
 }
 
 type RequestJsonBody any
@@ -90,3 +92,12 @@ type requestExecutionResult struct {
 	res   *Response
 	error error
 }
+
+type Retry struct {
+	Max           int
+	Delay         time.Duration
+	IgnoredErrors []error
+	EndingErrors  []error
+}
+
+type doFunc func(*Request) (*Response, error)

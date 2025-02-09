@@ -8,3 +8,7 @@ var (
 	ErrProxyFormatCorrupted = errors.New("proxy format corrupted, cannot parse")
 	ErrRequestNotInitiated  = errors.New("request was not built yet")
 )
+
+var (
+	ErrRetryExceed = errors.New("retry max exceed")
+)

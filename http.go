@@ -95,7 +95,7 @@ func (c *Client) do(url string, options ...any) (*Response, error) {
 		return &Response{}, err
 	}
 
-	return c.Do(req)
+	return c.cfg.retry.Retry(c.Do, req)
 }
 
 func (c *Client) Get(url string, options ...any) (*Response, error) {

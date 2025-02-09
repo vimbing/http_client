@@ -75,6 +75,10 @@ func WithHttpSettings(settings Http2Settings) OptionHttpSettings {
 	return OptionHttpSettings(settings)
 }
 
+func WithRetry(retry *Retry) OptionRetry {
+	return OptionRetry(retry)
+}
+
 func parseOptions(options ...any) *Config {
 	defaultCfg := &Config{
 		proxies:       []string{},
@@ -82,6 +86,7 @@ func parseOptions(options ...any) *Config {
 		timeout:       time.Second * 15,
 		ja3:           tls.HelloChrome_120,
 		jar:           nil,
+		retry:         &Retry{},
 	}
 
 	for _, opt := range options {
@@ -120,6 +125,8 @@ func parseOptions(options ...any) *Config {
 			defaultCfg.httpSettings = profile.Http2Settings
 		case OptionInsecureSkipVerify:
 			defaultCfg.insecureSkipVerify = true
+		case OptionRetry:
+			defaultCfg.retry = v
 		}
 	}
 
