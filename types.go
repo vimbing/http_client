@@ -103,4 +103,4 @@ type Retry struct {
 
 type doFunc func(*Request) (*Response, error)
 
-type StatusValidationFunc func(status int) error
+type StatusValidationFunc func(status int, client *Client) error

@@ -120,7 +120,7 @@ func (c *Client) Do(req *Request) (*Response, error) {
 				return result.res, result.error
 			}
 
-			return result.res, c.cfg.statusValidationFunc(result.res.StatusCode())
+			return result.res, c.cfg.statusValidationFunc(result.res.StatusCode(), c)
 		case <-ctx.Done():
 			return nil, errors.New("context cancelled")
 		}
