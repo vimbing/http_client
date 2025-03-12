@@ -25,6 +25,7 @@ type OptionResponseMiddleware []ResponseMiddlewareFunc
 type OptionResponseErrorMiddleware []ResponseErrorMiddlewareFunc
 type OptionHttpSettings Http2Settings
 type OptionRetry *Retry
+type OptionStatusValidationFunc StatusValidationFunc
 
 type Client struct {
 	fhttpClient *fhttp.Client

@@ -79,14 +79,19 @@ func WithRetry(retry *Retry) OptionRetry {
 	return OptionRetry(retry)
 }
 
+func WithStatusValidation(f StatusValidationFunc) OptionStatusValidationFunc {
+	return OptionStatusValidationFunc(f)
+}
+
 func parseOptions(options ...any) *Config {
 	defaultCfg := &Config{
-		proxies:       []string{},
-		allowRedirect: true,
-		timeout:       time.Second * 15,
-		ja3:           tls.HelloChrome_120,
-		jar:           nil,
-		retry:         &Retry{},
+		proxies:              []string{},
+		allowRedirect:        true,
+		timeout:              time.Second * 15,
+		ja3:                  tls.HelloChrome_120,
+		jar:                  nil,
+		retry:                &Retry{},
+		statusValidationFunc: nil,
 	}
 
 	for _, opt := range options {
@@ -101,6 +106,8 @@ func parseOptions(options ...any) *Config {
 			defaultCfg.allowRedirect = false
 		case OptionCookieJar:
 			defaultCfg.jar = v
+		case OptionStatusValidationFunc:
+			defaultCfg.statusValidationFunc = StatusValidationFunc(v)
 		case OptionResponseMiddleware:
 			for _, m := range v {
 				defaultCfg.responseMiddleware = append(defaultCfg.responseMiddleware, ResponseMiddlewareFunc(m))
