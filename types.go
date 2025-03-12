@@ -7,7 +7,6 @@ import (
 	fhttp "github.com/vimbing/fhttp"
 	"github.com/vimbing/fhttp/cookiejar"
 	"github.com/vimbing/fhttp/http2"
-	"github.com/vimbing/retry"
 	tls "github.com/vimbing/vutls"
 )
 
@@ -56,6 +55,7 @@ type Config struct {
 	jar                     *cookiejar.Jar
 	httpSettings            Http2Settings
 	retry                   *Retry
+	statusValidationFunc    StatusValidationFunc
 }
 
 type RequestJsonBody any
@@ -73,7 +73,6 @@ type Request struct {
 	proto      string
 
 	host         *string
-	retrier      *retry.Retrier
 	tlsProfile   *TlsProfile
 	fhttpRequest *fhttp.Request
 }
@@ -98,6 +97,9 @@ type Retry struct {
 	Delay         time.Duration
 	IgnoredErrors []error
 	EndingErrors  []error
+	OnError       func(error)
 }
 
 type doFunc func(*Request) (*Response, error)
+
+type StatusValidationFunc func(status int) error

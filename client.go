@@ -7,7 +7,6 @@ import (
 
 	"github.com/samber/lo"
 	"github.com/vimbing/fhttp/cookiejar"
-	"github.com/vimbing/retry"
 )
 
 func (c *Client) BindJar(jar *cookiejar.Jar) {
@@ -102,35 +101,30 @@ func (c *Client) Do(req *Request) (*Response, error) {
 		return &Response{}, err
 	}
 
-	if req.retrier == nil {
-		req.retrier = &retry.Retrier{Max: 1}
+	resultChan := make(chan *requestExecutionResult, 1)
+
+	if c.cfg.forceRotation {
+		err := rebindRoundtripper(c.fhttpClient, c.cfg)
+
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	res := &Response{}
+	go c.executeRequest(req, resultChan)
 
-	return res, req.retrier.Retry(func() error {
-		resultChan := make(chan *requestExecutionResult, 1)
-
-		if c.cfg.forceRotation {
-			err := rebindRoundtripper(c.fhttpClient, c.cfg)
-
-			if err != nil {
-				return err
+	for {
+		select {
+		case result := <-resultChan:
+			if result.error != nil {
+				return result.res, result.error
 			}
-		}
 
-		go c.executeRequest(req, resultChan)
-
-		for {
-			select {
-			case result := <-resultChan:
-				res = result.res
-				return result.error
-			case <-ctx.Done():
-				return errors.New("context cancelled")
-			}
+			return result.res, c.cfg.statusValidationFunc(result.res.StatusCode())
+		case <-ctx.Done():
+			return nil, errors.New("context cancelled")
 		}
-	})
+	}
 }
 
 func (c *Client) UseRequest(f RequestMiddlewareFunc) {

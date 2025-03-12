@@ -21,6 +21,10 @@ func (r *Retry) Retry(f doFunc, req *Request) (*Response, error) {
 			return res, nil
 		}
 
+		if r.OnError != nil {
+			r.OnError(err)
+		}
+
 		if slices.Contains(r.EndingErrors, err) {
 			return res, err
 		}
