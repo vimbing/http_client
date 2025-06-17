@@ -143,6 +143,11 @@ func (c *Client) UseResponseError(f ResponseErrorMiddlewareFunc) {
 	c.cfg.responseErrorMiddleware = append(c.cfg.responseErrorMiddleware, f)
 }
 
+func (c *Client) DisableProxy() {
+	c.cfg.proxies = []string{}
+	rebindRoundtripper(c.fhttpClient, c.cfg)
+}
+
 func (c *Client) ChangeProxy(proxy string) {
 	p, _ := parseSingleProxy(proxy)
 	c.cfg.proxies = []string{string(p)}
