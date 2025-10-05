@@ -54,6 +54,18 @@ func socksDialer(pickedProxy string) (proxy.ContextDialer, error) {
 	return dialer, nil
 }
 
+// rebindRoundtripper rebinds the Transport of the provided http.Client using the
+// configuration in cfg by selecting and configuring an appropriate proxy dialer
+// and creating a new round tripper with the transport settings from cfg.
+//
+// If cfg.proxies contains entries, a proxy is chosen at random; a SOCKS5 dialer
+// is used when the proxy string contains "socks", otherwise a CONNECT dialer is
+// created. When no proxies are configured, proxy.Direct is used. The new
+// Transport is configured with cfg.transportSettings.HelloID, cfg.insecureSkipVerify,
+// the chosen dialer, and HTTP/2 settings from cfg.transportSettings.Http2Settings.
+//
+// The operation is retried up to three times on error. It returns any error
+// encountered while creating the dialer or configuring the Transport.
 func rebindRoundtripper(c *http.Client, cfg *Config) error {
 	return retry.Retrier{Max: 3, Delay: time.Second * 0}.Retry(func() error {
 		var dialer proxy.ContextDialer

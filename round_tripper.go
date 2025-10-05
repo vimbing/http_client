@@ -179,6 +179,9 @@ type roundTripperSettings struct {
 	http2SettingsOrder []http2.SettingID
 }
 
+// newRoundTripper creates a RoundTripper configured according to the provided settings.
+// It returns a roundTripper that uses the given dialer, TLS verification behavior, client hello identifier,
+// per-address transport and connection caches, and HTTP/2 settings and ordering.
 func newRoundTripper(settings roundTripperSettings) http.RoundTripper {
 	return &roundTripper{
 		dialer:             settings.dialer,

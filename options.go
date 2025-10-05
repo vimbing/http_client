@@ -9,6 +9,8 @@ import (
 	tls "github.com/vimbing/utls"
 )
 
+// WithForcedProxyRotation enables forced proxy rotation when applied as an option.
+// The returned OptionForcedProxyRotation indicates that the client should rotate proxies between requests.
 func WithForcedProxyRotation() OptionForcedProxyRotation {
 	return true
 }
@@ -31,22 +33,28 @@ func WithProxySocks(proxy string) OptionProxy {
 	return OptionProxy(parsed)
 }
 
+// WithProxyParsed returns an OptionProxy initialized with the provided proxy string.
 func WithProxyParsed(proxy string) OptionProxy {
 	return OptionProxy(proxy)
 }
 
+// WithTlsProfile returns an OptionTlsProfile that wraps the provided TlsProfile for use as a client option.
+// The returned option carries the profile and, when applied to a Config, configures the transport settings from that profile.
 func WithTlsProfile(profile TlsProfile) OptionTlsProfile {
 	return OptionTlsProfile(profile)
 }
 
+// WithDisallowedRedirects returns an OptionDisallowRedirect that disables automatic redirects in the client configuration.
 func WithDisallowedRedirects() OptionDisallowRedirect {
 	return false
 }
 
+// WithCustomTimeout returns an OptionTimeout that sets the client's timeout to the given duration.
 func WithCustomTimeout(timeout time.Duration) OptionTimeout {
 	return OptionTimeout(timeout)
 }
 
+// WithInsecureSkipVerify enables skipping TLS certificate verification when used as an option.
 func WithInsecureSkipVerify() OptionInsecureSkipVerify {
 	return OptionInsecureSkipVerify(true)
 }
@@ -63,10 +71,14 @@ func WithResponseMiddleware(m ...ResponseMiddlewareFunc) OptionResponseMiddlewar
 	return OptionResponseMiddleware(m)
 }
 
+// WithResponseErrorMiddleware creates an OptionResponseErrorMiddleware containing the provided response error middleware functions.
+// These middleware functions are intended to observe or transform response errors when the option is applied to a client.
 func WithResponseErrorMiddleware(m ...ResponseErrorMiddlewareFunc) OptionResponseErrorMiddleware {
 	return OptionResponseErrorMiddleware(m)
 }
 
+// WithRetry wraps the provided retry configuration as an OptionRetry for client configuration.
+// The returned OptionRetry, when applied to the client config, sets the client's retry behavior to the given *Retry (may be nil).
 func WithRetry(retry *Retry) OptionRetry {
 	return OptionRetry(retry)
 }
@@ -75,6 +87,11 @@ func WithStatusValidation(f StatusValidationFunc) OptionStatusValidationFunc {
 	return OptionStatusValidationFunc(f)
 }
 
+// parseOptions builds a Config by applying a variadic list of option values.
+// It recognizes option types that configure proxies, redirect behavior, timeout,
+// transport/TLS settings, cookie jar, middlewares, retry behavior, and status
+// validation; unknown option types are ignored. The constructed *Config is
+// returned.
 func parseOptions(options ...any) *Config {
 	defaultCfg := &Config{
 		proxies:              []string{},
