@@ -14,6 +14,24 @@ func (c *Client) GetCookies(u *url.URL) []*http.Cookie {
 	return c.fhttpClient.Jar.Cookies(u)
 }
 
+func (c *Client) GetCookieByName(u *url.URL, name string) *http.Cookie {
+	if c.fhttpClient.Jar == nil {
+		return nil
+	}
+
+	cookies := c.GetCookies(u)
+
+	var foundCookie *http.Cookie
+
+	for _, cookie := range cookies {
+		if cookie.Name == name {
+			foundCookie = cookie
+		}
+	}
+
+	return foundCookie
+}
+
 func (c *Client) RemoveCookie(u *url.URL, name string) {
 	cookies := c.GetCookies(u)
 

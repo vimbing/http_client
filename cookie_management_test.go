@@ -195,3 +195,41 @@ func TestCookieUpdate(t *testing.T) {
 		}
 	}
 }
+
+func TestGetCookieByName(t *testing.T) {
+	testCases := []struct {
+		cookieName  string
+		cookieValue string
+	}{
+		{cookieName: "foo", cookieValue: "bar"},
+		{cookieName: "bar", cookieValue: "foo"},
+		{cookieName: "test_cookie", cookieValue: "test_value"},
+		{cookieName: "cookie1", cookieValue: "cookie1_value"},
+	}
+
+	for _, testCase := range testCases {
+		jar, _ := cookiejar.New(nil)
+
+		client := MustNew(
+			WithCookieJar(jar),
+		)
+
+		parsedUrl, err := url.Parse(fmt.Sprintf("http://127.0.0.1:%d/cookie-set", testServerPort))
+
+		if err != nil {
+			t.Fatalf("Unexpected error while parsing test url: %v", err)
+		}
+
+		client.AddCookieSimple(parsedUrl, testCase.cookieName, testCase.cookieValue)
+
+		cookie := client.GetCookieByName(parsedUrl, testCase.cookieName)
+
+		if cookie == nil {
+			t.Fatalf("Expected to get cookie by name: %s, but got <nil>", testCase.cookieName)
+		}
+
+		if cookie.Value != testCase.cookieValue {
+			t.Fatalf("Unexpected cookie value got %s, expected: %s", cookie.Value, testCase.cookieValue)
+		}
+	}
+}
