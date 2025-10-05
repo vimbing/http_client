@@ -1,4 +1,4 @@
-package http
+package http_client
 
 import (
 	"time"
@@ -6,7 +6,7 @@ import (
 	"github.com/repeale/fp-go"
 	lo "github.com/samber/lo"
 	"github.com/vimbing/fhttp/cookiejar"
-	tls "github.com/vimbing/vutls"
+	tls "github.com/vimbing/utls"
 )
 
 func WithForcedProxyRotation() OptionForcedProxyRotation {
@@ -35,20 +35,16 @@ func WithProxyParsed(proxy string) OptionProxy {
 	return OptionProxy(proxy)
 }
 
+func WithTlsProfile(profile TlsProfile) OptionTlsProfile {
+	return OptionTlsProfile(profile)
+}
+
 func WithDisallowedRedirects() OptionDisallowRedirect {
 	return false
 }
 
 func WithCustomTimeout(timeout time.Duration) OptionTimeout {
 	return OptionTimeout(timeout)
-}
-
-func WithUtlsJa3Helloid(ja3HelloId tls.ClientHelloID) OptionUtlsJa3HelloId {
-	return OptionUtlsJa3HelloId(ja3HelloId)
-}
-
-func WithTlsProfile(tlsProfile TlsProfile) OptionTlsProfile {
-	return OptionTlsProfile(tlsProfile)
 }
 
 func WithInsecureSkipVerify() OptionInsecureSkipVerify {
@@ -71,10 +67,6 @@ func WithResponseErrorMiddleware(m ...ResponseErrorMiddlewareFunc) OptionRespons
 	return OptionResponseErrorMiddleware(m)
 }
 
-func WithHttpSettings(settings Http2Settings) OptionHttpSettings {
-	return OptionHttpSettings(settings)
-}
-
 func WithRetry(retry *Retry) OptionRetry {
 	return OptionRetry(retry)
 }
@@ -88,7 +80,7 @@ func parseOptions(options ...any) *Config {
 		proxies:              []string{},
 		allowRedirect:        true,
 		timeout:              time.Second * 15,
-		ja3:                  tls.HelloChrome_120,
+		transportSettings:    TransportSettings{},
 		jar:                  nil,
 		retry:                &Retry{},
 		statusValidationFunc: nil,
@@ -122,14 +114,61 @@ func parseOptions(options ...any) *Config {
 			}
 		case OptionTimeout:
 			defaultCfg.timeout = time.Duration(v)
-		case OptionUtlsJa3HelloId:
-			defaultCfg.ja3 = tls.ClientHelloID(v)
-		case OptionHttpSettings:
-			defaultCfg.httpSettings = Http2Settings(v)
+		case OptionTLSHelloID:
+			defaultCfg.transportSettings.HelloID = tls.ClientHelloID(v)
 		case OptionTlsProfile:
-			profile := TlsProfile(v)
-			defaultCfg.tlsProfile = &profile
-			defaultCfg.httpSettings = profile.Http2Settings
+			p := TlsProfile(v)
+			defaultCfg.transportSettings = p.TransportSettings
+
+			// bogdanHelloID := p.GetClientHelloId()
+			// bogdanSpec, err := p.GetClientHelloSpec()
+			// var spec *tls.ClientHelloSpec
+
+			// if err == nil {
+			// 	spec = &tls.ClientHelloSpec{
+			// 		CipherSuites:       bogdanSpec.CipherSuites,
+			// 		CompressionMethods: bogdanSpec.CompressionMethods,
+			// 	}
+
+			// 	for _, extension := range bogdanSpec.Extensions {
+			// 		spec.Extensions = append(spec.Extensions, extension.(tls.TLSExtension))
+			// 	}
+			// }
+
+			// helloID := tls.ClientHelloID{
+			// 	Client:  bogdanHelloID.Client,
+			// 	Version: bogdanHelloID.Version,
+			// 	Seed:    (*tls.PRNGSeed)(bogdanHelloID.Seed),
+			// 	Weights: &tls.DefaultWeights,
+			// }
+
+			// defaultCfg.transportSettings.helloID = helloID
+			// defaultCfg.transportSettings.Flow = p.GetConnectionFlow()
+
+			// http2Settings := map[http2.SettingID]uint32{}
+			// http2SettingsOrder := []http2.SettingID{}
+
+			// for _, settingOrderSettingID := range p.GetSettingsOrder() {
+			// 	http2SettingsOrder = append(http2SettingsOrder, http2.SettingID(settingOrderSettingID))
+			// }
+
+			// for key, value := range p.GetSettings() {
+			// 	if http2.SettingEnablePush == http2.SettingID(key) {
+			// 		if (value) == 0 {
+			// 			defaultCfg.transportSettings.DisablePush = true
+			// 		}
+			// 	}
+
+			// 	http2Settings[http2.SettingID(key)] = value
+			// }
+
+			// defaultCfg.transportSettings.Http2Settings = TransportHttp2Settings{
+			// 	Order:    http2SettingsOrder,
+			// 	Settings: http2Settings,
+			// }
+
+			// TODO
+			// defaultCfg.transportSettings.DisablePush = p
 		case OptionInsecureSkipVerify:
 			defaultCfg.insecureSkipVerify = true
 		case OptionRetry:

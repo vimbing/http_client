@@ -1,4 +1,4 @@
-package http
+package http_client
 
 import (
 	"fmt"
@@ -10,10 +10,6 @@ import (
 )
 
 func (c *Client) reinitFhttpClient() error {
-	if c.cfg.tlsProfile != nil && c.cfg.tlsProfile.Ja3.IsSet() {
-		c.cfg.ja3 = c.cfg.tlsProfile.Ja3
-	}
-
 	newClient, err := newFhttpClient(c.cfg)
 
 	if err != nil {

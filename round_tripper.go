@@ -1,4 +1,4 @@
-package http
+package http_client
 
 import (
 	"context"
@@ -13,7 +13,7 @@ import (
 	"github.com/vimbing/fhttp/http2"
 	"golang.org/x/net/proxy"
 
-	utls "github.com/vimbing/vutls"
+	tls "github.com/vimbing/utls"
 )
 
 var errProtocolNegotiated = errors.New("protocol negotiated")
@@ -22,7 +22,8 @@ type roundTripper struct {
 	sync.Mutex
 
 	insecureSkipVerify bool
-	clientHelloId      utls.ClientHelloID
+	clientHelloId      tls.ClientHelloID
+	clientHelloSpec    *tls.ClientHelloSpec
 
 	cachedConnections map[string]net.Conn
 	cachedTransports  map[string]http.RoundTripper
@@ -99,11 +100,11 @@ func (rt *roundTripper) dialTLS(ctx context.Context, network, addr string) (net.
 		host = addr
 	}
 
-	conn := utls.UClient(rawConn, &utls.Config{
+	conn := tls.UClient(rawConn, &tls.Config{
 		ServerName:         host,
 		InsecureSkipVerify: rt.insecureSkipVerify,
 	},
-		rt.clientHelloId,
+		tls.HelloChrome_100,
 	)
 
 	if err != nil {
@@ -127,7 +128,7 @@ func (rt *roundTripper) dialTLS(ctx context.Context, network, addr string) (net.
 	case http2.NextProtoTLS:
 		t2 := http2.Transport{DialTLS: rt.dialTLSHTTP2}
 
-		if len(rt.http2Settings) == 0 || len(rt.http2SettingsOrder) == 0 {
+		if len(rt.http2Settings) == 0 && len(rt.http2SettingsOrder) == 0 {
 			t2.HeaderTableSize = 65536
 
 			t2.Settings = []http2.Setting{
@@ -145,10 +146,6 @@ func (rt *roundTripper) dialTLS(ctx context.Context, network, addr string) (net.
 			}
 		}
 
-		if !rt.disablePush {
-			t2.PushHandler = &http2.DefaultPushHandler{}
-		}
-
 		rt.cachedTransports[addr] = &t2
 	default:
 		// Assume the remote peer is speaking HTTP 1.x + TLS.
@@ -162,7 +159,7 @@ func (rt *roundTripper) dialTLS(ctx context.Context, network, addr string) (net.
 	return nil, errProtocolNegotiated
 }
 
-func (rt *roundTripper) dialTLSHTTP2(network, addr string, _ *utls.Config) (net.Conn, error) {
+func (rt *roundTripper) dialTLSHTTP2(network, addr string, _ *tls.Config) (net.Conn, error) {
 	return rt.dialTLS(context.Background(), network, addr)
 }
 
@@ -175,12 +172,11 @@ func (rt *roundTripper) getDialTLSAddr(req *http.Request) string {
 }
 
 type roundTripperSettings struct {
-	clientHello        utls.ClientHelloID
+	clientHello        tls.ClientHelloID
 	insecureSkipVerify bool
 	dialer             proxy.ContextDialer
 	http2Settings      map[http2.SettingID]uint32
 	http2SettingsOrder []http2.SettingID
-	disablePush        bool
 }
 
 func newRoundTripper(settings roundTripperSettings) http.RoundTripper {
@@ -192,6 +188,5 @@ func newRoundTripper(settings roundTripperSettings) http.RoundTripper {
 		cachedConnections:  make(map[string]net.Conn),
 		http2Settings:      settings.http2Settings,
 		http2SettingsOrder: settings.http2SettingsOrder,
-		disablePush:        settings.disablePush,
 	}
 }
