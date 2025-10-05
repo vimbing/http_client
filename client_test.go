@@ -3,6 +3,8 @@ package http_client
 import (
 	"errors"
 	"fmt"
+	"os"
+	"strings"
 	"testing"
 	"time"
 
@@ -195,6 +197,38 @@ func TestRequestCancelation(t *testing.T) {
 			if res.StatusCode() != http.StatusOK {
 				t.Fatalf("Unexpected response status code: %s", res.Status())
 			}
+		}
+	}
+}
+
+func TestProxyRotation(t *testing.T) {
+	proxy := os.Getenv("TEST_PROXY")
+
+	if len(proxy) == 0 {
+		t.Skip("Omiting proxy test, becouse no proxy was provided in env. If you want to perform this test, set env variable: TEST_PROXY=host:port@user:password;host2:port2@user2:password2")
+		return
+	}
+
+	proxies := strings.Split(proxy, ";")
+	lastAddress := ""
+
+	client := MustNew(
+		WithTlsProfile(chrome140Profile()),
+	)
+
+	for _, proxy := range proxies {
+		client.ChangeProxy(proxy)
+
+		res, err := client.Get("https://icanhazip.com")
+
+		if err != nil {
+			t.Fatalf("Unexpected error while getting ip service: %v", err)
+		}
+
+		t.Logf("Ip service responded with ip: %s", res.BodyString())
+
+		if lastAddress == res.BodyString() {
+			t.Fatalf("Proxy repeated after rotation: %s", lastAddress)
 		}
 	}
 }
