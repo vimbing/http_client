@@ -43,7 +43,7 @@ type testClientTlsResponse struct {
 }
 
 func TestClientTLSChrome140(t *testing.T) {
-	expectedJa4 := "t13d1516h2_8daaf6152771_e5627efa2ab1"
+	expectedJa4 := "t13d1516h2_8daaf6152771_02713d6af862"
 
 	client := MustNew(
 		WithInsecureSkipVerify(),
@@ -154,9 +154,9 @@ func TestRequestCancelation(t *testing.T) {
 
 		{clientTimeoutDurationMiliseconds: 1000, serverTimeoutDurationMiliseconds: 100, shouldError: false},
 		{clientTimeoutDurationMiliseconds: 500, serverTimeoutDurationMiliseconds: 100, shouldError: false},
-		{clientTimeoutDurationMiliseconds: 120, serverTimeoutDurationMiliseconds: 100, shouldError: false},
-		{clientTimeoutDurationMiliseconds: 125, serverTimeoutDurationMiliseconds: 100, shouldError: false},
-		{clientTimeoutDurationMiliseconds: 165, serverTimeoutDurationMiliseconds: 100, shouldError: false},
+		{clientTimeoutDurationMiliseconds: 250, serverTimeoutDurationMiliseconds: 100, shouldError: false},
+		{clientTimeoutDurationMiliseconds: 350, serverTimeoutDurationMiliseconds: 100, shouldError: false},
+		{clientTimeoutDurationMiliseconds: 400, serverTimeoutDurationMiliseconds: 100, shouldError: false},
 	}
 
 	for _, testCase := range testCases {

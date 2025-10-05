@@ -104,8 +104,15 @@ func (rt *roundTripper) dialTLS(ctx context.Context, network, addr string) (net.
 		ServerName:         host,
 		InsecureSkipVerify: rt.insecureSkipVerify,
 	},
-		tls.HelloChrome_100,
+		rt.clientHelloId,
 	)
+
+	if rt.clientHelloSpec != nil {
+		if err := conn.ApplyPreset(rt.clientHelloSpec); err != nil {
+			_ = conn.Close()
+			return nil, err
+		}
+	}
 
 	if err != nil {
 		_ = conn.Close()
