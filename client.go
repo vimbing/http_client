@@ -1,8 +1,7 @@
-package http
+package http_client
 
 import (
 	"bytes"
-	"errors"
 	"io"
 
 	"github.com/samber/lo"
@@ -89,8 +88,6 @@ func (c *Client) Do(req *Request) (*Response, error) {
 		}
 	}
 
-	req.tlsProfile = c.cfg.tlsProfile
-
 	ctx, reqCtxCancel, err := req.Build(
 		c.cfg.timeout,
 	)
@@ -126,7 +123,7 @@ func (c *Client) Do(req *Request) (*Response, error) {
 
 			return result.res, nil
 		case <-ctx.Done():
-			return nil, errors.New("context cancelled")
+			return nil, ErrRequestTimedOut
 		}
 	}
 }

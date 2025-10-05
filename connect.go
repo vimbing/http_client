@@ -1,4 +1,4 @@
-package http
+package http_client
 
 // Copyright 2018 Google Inc.
 //

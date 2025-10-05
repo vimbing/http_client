@@ -1,4 +1,4 @@
-package http
+package http_client
 
 import (
 	"io"
@@ -7,7 +7,7 @@ import (
 	fhttp "github.com/vimbing/fhttp"
 	"github.com/vimbing/fhttp/cookiejar"
 	"github.com/vimbing/fhttp/http2"
-	tls "github.com/vimbing/vutls"
+	tls "github.com/vimbing/utls"
 )
 
 type OptionStringJa string
@@ -15,15 +15,13 @@ type OptionTimeout time.Duration
 type OptionProxy string
 type OptionDisallowRedirect bool
 type OptionForcedProxyRotation bool
-type OptionUtlsJa3HelloId tls.ClientHelloID
-type OptionUtlsJa3HelloSpec tls.ClientHelloSpec
+type OptionTLSHelloID tls.ClientHelloID
 type OptionTlsProfile TlsProfile
 type OptionInsecureSkipVerify bool
 type OptionCookieJar *cookiejar.Jar
 type OptionRequestMiddleware []RequestMiddlewareFunc
 type OptionResponseMiddleware []ResponseMiddlewareFunc
 type OptionResponseErrorMiddleware []ResponseErrorMiddlewareFunc
-type OptionHttpSettings Http2Settings
 type OptionRetry *Retry
 type OptionStatusValidationFunc StatusValidationFunc
 
@@ -36,10 +34,16 @@ type RequestMiddlewareFunc func(*Request) error
 type ResponseMiddlewareFunc func(*Response) error
 type ResponseErrorMiddlewareFunc func(*Request, error)
 
-type Http2Settings struct {
-	Order       []http2.SettingID
-	Settings    map[http2.SettingID]uint32
-	DisablePush bool
+type TransportHttp2Settings struct {
+	Order    []http2.SettingID
+	Settings map[http2.SettingID]uint32
+}
+
+type TransportSettings struct {
+	Spec          *tls.ClientHelloSpec
+	HelloID       tls.ClientHelloID
+	Http2Settings TransportHttp2Settings
+	Flow          uint32
 }
 
 type Config struct {
@@ -51,10 +55,8 @@ type Config struct {
 	forceRotation           bool
 	allowRedirect           bool
 	timeout                 time.Duration
-	ja3                     tls.ClientHelloID
-	tlsProfile              *TlsProfile
 	jar                     *cookiejar.Jar
-	httpSettings            Http2Settings
+	transportSettings       TransportSettings
 	retry                   *Retry
 	statusValidationFunc    StatusValidationFunc
 }
@@ -69,23 +71,20 @@ type Request struct {
 	Header fhttp.Header
 	Url    string
 
+	// ctx       context.Context
+	// ctxCancel context.CancelFunc
+
 	protoMinor int
 	protoMajor int
 	proto      string
 
 	host         *string
-	tlsProfile   *TlsProfile
 	fhttpRequest *fhttp.Request
 }
 
 type Response struct {
 	Body          []byte
 	fhttpResponse *fhttp.Response
-}
-
-type TlsProfile struct {
-	Http2Settings Http2Settings
-	Ja3           tls.ClientHelloID
 }
 
 type requestExecutionResult struct {
@@ -104,3 +103,7 @@ type Retry struct {
 type doFunc func(*Request) (*Response, error)
 
 type StatusValidationFunc func(status int, client *Client) error
+
+type TlsProfile struct {
+	TransportSettings
+}

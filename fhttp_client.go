@@ -1,4 +1,4 @@
-package http
+package http_client
 
 import (
 	"errors"
@@ -76,12 +76,11 @@ func rebindRoundtripper(c *http.Client, cfg *Config) error {
 		}
 
 		c.Transport = newRoundTripper(roundTripperSettings{
-			clientHello:        cfg.ja3,
+			clientHello:        cfg.transportSettings.HelloID,
 			insecureSkipVerify: cfg.insecureSkipVerify,
 			dialer:             dialer,
-			http2Settings:      cfg.httpSettings.Settings,
-			http2SettingsOrder: cfg.httpSettings.Order,
-			disablePush:        cfg.httpSettings.DisablePush,
+			http2Settings:      cfg.transportSettings.Http2Settings.Settings,
+			http2SettingsOrder: cfg.transportSettings.Http2Settings.Order,
 		})
 
 		return nil
