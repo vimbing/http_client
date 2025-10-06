@@ -6,6 +6,7 @@ toolchain go1.24.7
 
 require (
 	github.com/andybalholm/brotli v1.1.1
+	github.com/google/uuid v1.6.0
 	github.com/klauspost/compress v1.18.0
 	github.com/repeale/fp-go v0.11.1
 	github.com/samber/lo v1.39.0
@@ -16,7 +17,6 @@ require (
 )
 
 require (
-	github.com/google/uuid v1.6.0 // indirect
 	golang.org/x/crypto v0.36.0 // indirect
 	golang.org/x/exp v0.0.0-20220303212507-bbda1eaf7a17 // indirect
 	golang.org/x/sys v0.31.0 // indirect
