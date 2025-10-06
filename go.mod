@@ -6,6 +6,7 @@ toolchain go1.24.7
 
 require (
 	github.com/andybalholm/brotli v1.1.1
+	github.com/google/uuid v1.6.0
 	github.com/klauspost/compress v1.18.0
 	github.com/repeale/fp-go v0.11.1
 	github.com/samber/lo v1.39.0
