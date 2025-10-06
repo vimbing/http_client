@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"testing"
 
+	"github.com/google/uuid"
 	"github.com/vimbing/fhttp/cookiejar"
 )
 
@@ -230,6 +231,53 @@ func TestGetCookieByName(t *testing.T) {
 
 		if cookie.Value != testCase.cookieValue {
 			t.Fatalf("Unexpected cookie value got %s, expected: %s", cookie.Value, testCase.cookieValue)
+		}
+	}
+}
+
+func TestClearAllCookies(t *testing.T) {
+	expectedCookiesCount := 0
+
+	testCases := []struct {
+		createdCookiesCount int
+	}{
+		{createdCookiesCount: 10},
+		{createdCookiesCount: 25},
+		{createdCookiesCount: 30},
+		{createdCookiesCount: 1},
+		{createdCookiesCount: 0},
+		{createdCookiesCount: 34},
+	}
+
+	for _, testCase := range testCases {
+		jar, _ := cookiejar.New(nil)
+
+		client := MustNew(
+			WithCookieJar(jar),
+		)
+
+		parsedUrl, err := url.Parse(fmt.Sprintf("http://127.0.0.1:%d/cookie-set", testServerPort))
+
+		if err != nil {
+			t.Fatalf("Unexpected error while parsing test url: %v", err)
+		}
+
+		for range testCase.createdCookiesCount {
+			client.AddCookieSimple(parsedUrl, uuid.NewString(), uuid.NewString())
+		}
+
+		cookiesCount := len(client.GetCookies(parsedUrl))
+
+		if cookiesCount != testCase.createdCookiesCount {
+			t.Fatalf("Unexpected cookies count after adding, got: %d, expected: %d", cookiesCount, testCase.createdCookiesCount)
+		}
+
+		client.ClearAllCookies(parsedUrl)
+
+		cookiesCount = len(client.GetCookies(parsedUrl))
+
+		if cookiesCount != expectedCookiesCount {
+			t.Fatalf("Unexpected cookies count after clearing, got: %d, expected: %d", cookiesCount, expectedCookiesCount)
 		}
 	}
 }

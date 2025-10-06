@@ -75,3 +75,15 @@ func (c *Client) UpdateCookie(u *url.URL, cookie *http.Cookie) {
 	c.RemoveCookie(u, cookie.Name)
 	c.AddCookie(u, cookie)
 }
+
+func (c *Client) ClearAllCookies(u *url.URL) {
+	if c.fhttpClient.Jar == nil {
+		return
+	}
+
+	cookies := c.GetCookies(u)
+
+	for _, cookie := range cookies {
+		c.RemoveCookie(u, cookie.Name)
+	}
+}
