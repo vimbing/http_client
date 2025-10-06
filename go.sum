@@ -14,6 +14,8 @@ github.com/vimbing/retry v0.0.0-20240429231038-75d39d3774db h1:3unER8Y6uLCI3ahto
 github.com/vimbing/retry v0.0.0-20240429231038-75d39d3774db/go.mod h1:KpRUUhEkH+ulbRjS7M/RnWODdcvvoPxr5HeZLRyqACc=
 github.com/vimbing/utls v0.0.0-20251004215618-3564f8905e90 h1:RgBxq6fySV6jfJbpJk8s/RUfKf8raxJF0wzELCvw6kc=
 github.com/vimbing/utls v0.0.0-20251004215618-3564f8905e90/go.mod h1:X3Yif/Idn9ZmJCnG0FQQuUkgPUn3nZ11Ycn8942gL0M=
+github.com/vimbing/utls v0.0.0-20251006211133-eb050806c8cf h1:oMqkdm8Bw96Zk+nFYxVnMdZ8wWd+47gkrlYCop9HGmI=
+github.com/vimbing/utls v0.0.0-20251006211133-eb050806c8cf/go.mod h1:X3Yif/Idn9ZmJCnG0FQQuUkgPUn3nZ11Ycn8942gL0M=
 github.com/xyproto/randomstring v1.0.5 h1:YtlWPoRdgMu3NZtP45drfy1GKoojuR7hmRcnhZqKjWU=
 github.com/xyproto/randomstring v1.0.5/go.mod h1:rgmS5DeNXLivK7YprL0pY+lTuhNQW3iGxZ18UQApw/E=
 golang.org/x/crypto v0.36.0 h1:AnAEvhDddvBdpY+uR+MyHmuZzzNqXSe/GvuDeob5L34=
